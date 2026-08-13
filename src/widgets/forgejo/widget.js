@@ -6,6 +6,19 @@ const widget = {
   proxyHandler: genericProxyHandler,
 
   mappings: {
+    notifications: {
+      endpoint: "notifications",
+    },
+    issues: {
+      endpoint: "repos/issues/search",
+      map: (data) => ({
+        pulls: asJson(data).filter((issue) => issue.pull_request),
+        issues: asJson(data).filter((issue) => !issue.pull_request),
+      }),
+    },
+    repositories: {
+      endpoint: "repos/search",
+    },
     pulls: {
       endpoint: "repos/{repository}/pulls?state=open&limit=50",
     },

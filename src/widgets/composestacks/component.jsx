@@ -79,10 +79,14 @@ export default function Component({ service }) {
     );
   }
 
+  // stacks with nothing running (or in error) sink to the bottom; config order is kept otherwise
+  const isActive = (stack) => !stack.error && stack.running > 0;
+  const sortedStacks = [...stacks].sort((a, b) => isActive(b) - isActive(a));
+
   return (
     <Container service={service}>
       <div className="flex flex-col w-full">
-        {stacks.map((stack) => {
+        {sortedStacks.map((stack) => {
           const running = !stack.error && stack.running > 0;
           const busyHere = busyStack === stack.name;
           return (

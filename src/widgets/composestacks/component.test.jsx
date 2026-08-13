@@ -30,6 +30,26 @@ describe("widgets/composestacks/component", () => {
     expect(screen.getByText("3/4")).toBeInTheDocument();
   });
 
+  it("sorts stopped and errored stacks below running ones", async () => {
+    fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        stacks: [
+          { name: "stopped", running: 0, total: 2 },
+          { name: "broken", error: "status failed" },
+          { name: "media", running: 3, total: 4 },
+          { name: "monitoring", running: 1, total: 1 },
+        ],
+      }),
+    });
+
+    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+    await waitFor(() => expect(screen.getByText("media")).toBeInTheDocument());
+
+    const names = screen.getAllByTitle(/running|status failed/).map((node) => node.textContent.trim());
+    expect(names).toEqual(["media", "monitoring", "stopped", "broken"]);
+  });
+
   it("posts the update action for a stack", async () => {
     fetch.mockResolvedValue({
       ok: true,

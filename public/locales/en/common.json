@@ -157,7 +157,10 @@
         "seed": "Seed"
     },
     "forgejo": {
-        "configure": "Set a repository (owner/repo) in the widget config",
+        "notifications": "Notifications",
+        "issues": "Issues",
+        "pullRequests": "Pull Requests",
+        "repositories": "Repositories",
         "pulls": "Open PRs",
         "commits": "Commits",
         "runs": "Actions",

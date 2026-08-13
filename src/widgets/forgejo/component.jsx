@@ -39,30 +39,32 @@ function Row({ left, right, rightClass, title }) {
 export default function Component({ service }) {
   const { t } = useTranslation();
   const { widget } = service;
+  const { repository } = widget;
 
-  const { data: pulls, error: pullsError } = useWidgetAPI(widget, "pulls");
-  const { data: commits, error: commitsError } = useWidgetAPI(widget, "commits");
-  const { data: runsData, error: runsError } = useWidgetAPI(widget, "runs");
+  const { data: notifications, error: notificationsError } = useWidgetAPI(widget, "notifications");
+  const { data: issuesData, error: issuesError } = useWidgetAPI(widget, "issues");
+  const { data: repositories, error: repositoriesError } = useWidgetAPI(widget, "repositories");
 
-  if (!widget.repository) {
-    return (
-      <Container service={service}>
-        <Block value={t("forgejo.configure")} />
-      </Container>
-    );
-  }
+  // repository-specific endpoints only fire when a repository is configured
+  const { data: pulls, error: pullsError } = useWidgetAPI(widget, repository ? "pulls" : "");
+  const { data: commits, error: commitsError } = useWidgetAPI(widget, repository ? "commits" : "");
+  const { data: runsData, error: runsError } = useWidgetAPI(widget, repository ? "runs" : "");
 
-  const error = pullsError ?? commitsError ?? runsError;
+  const error = notificationsError ?? issuesError ?? repositoriesError ?? pullsError ?? commitsError ?? runsError;
   if (error) {
     return <Container service={service} error={error} />;
   }
 
-  if (!pulls || !commits || !runsData) {
+  const summaryReady = notifications && issuesData && repositories;
+  const repoReady = !repository || (pulls && commits && runsData);
+
+  if (!summaryReady || !repoReady) {
     return (
       <Container service={service}>
-        <Block label="forgejo.pulls" />
-        <Block label="forgejo.commits" />
-        <Block label="forgejo.runs" />
+        <Block label="forgejo.notifications" />
+        <Block label="forgejo.issues" />
+        <Block label="forgejo.pullRequests" />
+        <Block label="forgejo.repositories" />
       </Container>
     );
   }
@@ -70,46 +72,62 @@ export default function Component({ service }) {
   return (
     <Container service={service}>
       <div className="flex flex-col w-full">
-        <Section title={`${t("forgejo.pulls")} (${pulls.length})`}>
-          {pulls.slice(0, 3).map((pull) => (
-            <Row key={pull.number} left={`#${pull.number} ${pull.title}`} right={pull.user?.login} title={pull.title} />
-          ))}
-          {!pulls.length && <Row left={t("forgejo.empty")} />}
-        </Section>
+        <div className="flex flex-row w-full">
+          <Block label="forgejo.notifications" value={notifications.length} />
+          <Block label="forgejo.issues" value={issuesData.issues.length} />
+          <Block label="forgejo.pullRequests" value={issuesData.pulls.length} />
+          <Block label="forgejo.repositories" value={repositories.data.length} />
+        </div>
 
-        <Section title={t("forgejo.commits")}>
-          {commits.map((commit) => (
-            <Row
-              key={commit.sha}
-              left={commit.commit?.message?.split("\n")[0]}
-              right={t("common.relativeDate", { value: commit.commit?.committer?.date ?? commit.created })}
-              title={commit.sha?.slice(0, 10)}
-            />
-          ))}
-          {!commits.length && <Row left={t("forgejo.empty")} />}
-        </Section>
+        {repository && (
+          <>
+            <Section title={`${t("forgejo.pulls")} (${pulls.length})`}>
+              {pulls.slice(0, 3).map((pull) => (
+                <Row
+                  key={pull.number}
+                  left={`#${pull.number} ${pull.title}`}
+                  right={pull.user?.login}
+                  title={pull.title}
+                />
+              ))}
+              {!pulls.length && <Row left={t("forgejo.empty")} />}
+            </Section>
 
-        <Section title={t("forgejo.runs")}>
-          {runsData.runs.map((run) => (
-            <Row
-              key={run.id}
-              title={run.status}
-              left={
-                <span className="flex flex-row items-center min-w-0">
-                  <span
-                    className={classNames(
-                      "inline-block w-2 h-2 rounded-full mr-2 shrink-0",
-                      RUN_STATUS_STYLES[run.status] ?? "bg-gray-400",
-                    )}
-                  />
-                  <span className="truncate">{run.display_title ?? run.name}</span>
-                </span>
-              }
-              right={run.head_branch}
-            />
-          ))}
-          {!runsData.runs.length && <Row left={t("forgejo.empty")} />}
-        </Section>
+            <Section title={t("forgejo.commits")}>
+              {commits.map((commit) => (
+                <Row
+                  key={commit.sha}
+                  left={commit.commit?.message?.split("\n")[0]}
+                  right={t("common.relativeDate", { value: commit.commit?.committer?.date ?? commit.created })}
+                  title={commit.sha?.slice(0, 10)}
+                />
+              ))}
+              {!commits.length && <Row left={t("forgejo.empty")} />}
+            </Section>
+
+            <Section title={t("forgejo.runs")}>
+              {runsData.runs.map((run) => (
+                <Row
+                  key={run.id}
+                  title={run.status}
+                  left={
+                    <span className="flex flex-row items-center min-w-0">
+                      <span
+                        className={classNames(
+                          "inline-block w-2 h-2 rounded-full mr-2 shrink-0",
+                          RUN_STATUS_STYLES[run.status] ?? "bg-gray-400",
+                        )}
+                      />
+                      <span className="truncate">{run.display_title ?? run.name}</span>
+                    </span>
+                  }
+                  right={run.head_branch}
+                />
+              ))}
+              {!runsData.runs.length && <Row left={t("forgejo.empty")} />}
+            </Section>
+          </>
+        )}
       </div>
     </Container>
   );

@@ -44,10 +44,16 @@ function localApiStatus(socketPath) {
 
 function toDevice(node, magicDNSSuffix, self = false) {
   const dnsName = node.DNSName?.replace(/\.$/, "");
+  // peers without a MagicDNS name (shared-in or tagged nodes) have an empty DNSName,
+  // so fall back through hostname and IP rather than showing a blank row
   const name =
-    magicDNSSuffix && dnsName?.endsWith(`.${magicDNSSuffix}`)
+    (magicDNSSuffix && dnsName?.endsWith(`.${magicDNSSuffix}`)
       ? dnsName.slice(0, -(magicDNSSuffix.length + 1))
-      : (dnsName ?? node.HostName);
+      : dnsName) ||
+    node.HostName ||
+    node.ComputedName ||
+    node.TailscaleIPs?.[0] ||
+    "unknown";
 
   return {
     name,
