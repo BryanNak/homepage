@@ -79,10 +79,9 @@ describe("widgets/diskhealth/component", () => {
       error: undefined,
     });
 
-    const { container } = renderWithProviders(
-      <Component service={{ widget: { type: "diskhealth", warning: 55 } }} />,
-      { settings: { hideErrors: false } },
-    );
+    const { container } = renderWithProviders(<Component service={{ widget: { type: "diskhealth", warning: 55 } }} />, {
+      settings: { hideErrors: false },
+    });
 
     expect(container.querySelectorAll(".bg-amber-400")).toHaveLength(2);
     expect(container.querySelectorAll(".bg-emerald-400")).toHaveLength(0);

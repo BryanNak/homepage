@@ -14,7 +14,6 @@ permissions:
   id-token: write
 
 jobs:
-
   test:
     name: Test Build Docs
     if: github.repository == 'gethomepage/homepage' && github.event_name == 'pull_request'

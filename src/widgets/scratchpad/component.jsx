@@ -96,7 +96,12 @@ export default function Component({ service }) {
               onChange={(event) => setText(event.target.value)}
             />
             <div className="flex flex-row gap-1 justify-end">
-              <button type="button" className={buttonClass} onClick={() => setExpanded(true)} title={t("scratchpad.expand")}>
+              <button
+                type="button"
+                className={buttonClass}
+                onClick={() => setExpanded(true)}
+                title={t("scratchpad.expand")}
+              >
                 ⤢
               </button>
               <button type="button" className={buttonClass} onClick={lock}>
