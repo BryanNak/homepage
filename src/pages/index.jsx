@@ -469,7 +469,7 @@ function Home({ initialSettings }) {
               `backdrop-blur${settings.cardBlur.length ? "-" : ""}${settings.cardBlur}`,
           )}
         >
-          <div id="widgets-wrap" className={classNames("flex flex-row w-full flex-wrap justify-between gap-x-2")}>
+          <div id="widgets-wrap" className={classNames("flex flex-row w-full flex-wrap justify-between gap-x-2 gap-y-2")}>
             {widgets && (
               <>
                 {widgets
@@ -484,10 +484,7 @@ function Home({ initialSettings }) {
 
                 <div
                   id="information-widgets-right"
-                  className={classNames(
-                    "m-auto flex flex-wrap grow sm:basis-auto justify-between md:justify-end",
-                    "m-auto flex flex-wrap grow sm:basis-auto justify-between md:justify-end gap-x-2",
-                  )}
+                  className="m-auto flex flex-wrap grow sm:basis-auto justify-between md:justify-end gap-x-2"
                 >
                   {widgets
                     .filter((widget) => rightAlignedWidgets.includes(widget.type))

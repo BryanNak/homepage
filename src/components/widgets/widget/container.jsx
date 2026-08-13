@@ -24,7 +24,7 @@ export function getAllClasses(options, additionalClassNames = "") {
     );
   }
 
-  let widgetAlignedClasses = "flex flex-col max-w:full sm:basis-auto self-center grow-0 flex-wrap";
+  let widgetAlignedClasses = "flex flex-col max-w-full sm:basis-auto self-center grow-0 flex-wrap";
   if (options?.style?.isRightAligned) {
     widgetAlignedClasses = "flex flex-col justify-center";
   }

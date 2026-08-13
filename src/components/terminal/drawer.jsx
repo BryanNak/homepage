@@ -13,6 +13,10 @@ const statusColors = {
   disconnected: "bg-rose-400",
 };
 
+const MIN_FONT_SIZE = 8;
+const MAX_FONT_SIZE = 24;
+const FONT_SIZE_STEP = 2;
+
 export default function TerminalDrawer({ config }) {
   const { t } = useTranslation();
 
@@ -20,6 +24,7 @@ export default function TerminalDrawer({ config }) {
   const [started, setStarted] = useState(false);
   const [status, setStatus] = useState("idle");
   const [generation, setGeneration] = useState(0);
+  const [fontSize, setFontSize] = useState(config.fontSize || 14);
 
   const show = () => {
     setStarted(true);
@@ -27,8 +32,6 @@ export default function TerminalDrawer({ config }) {
   };
 
   const disconnect = () => {
-    // unmounting the terminal closes the websocket, which makes ttyd
-    // terminate the backend shell for this session
     setStarted(false);
     setStatus("idle");
   };
@@ -38,6 +41,9 @@ export default function TerminalDrawer({ config }) {
     setStatus("connecting");
     setStarted(true);
   };
+
+  const zoomIn = () => setFontSize((s) => Math.min(s + FONT_SIZE_STEP, MAX_FONT_SIZE));
+  const zoomOut = () => setFontSize((s) => Math.max(s - FONT_SIZE_STEP, MIN_FONT_SIZE));
 
   return (
     <>
@@ -85,6 +91,24 @@ export default function TerminalDrawer({ config }) {
               <span className="opacity-75">{t(`terminal.${status}`)}</span>
             </div>
             <div className="flex flex-row gap-2">
+              <button
+                type="button"
+                className={headerButtonClass}
+                onClick={zoomOut}
+                disabled={fontSize <= MIN_FONT_SIZE}
+                aria-label="Zoom out"
+              >
+                &minus;
+              </button>
+              <button
+                type="button"
+                className={headerButtonClass}
+                onClick={zoomIn}
+                disabled={fontSize >= MAX_FONT_SIZE}
+                aria-label="Zoom in"
+              >
+                +
+              </button>
               {started && status !== "disconnected" ? (
                 <button type="button" className={headerButtonClass} onClick={disconnect}>
                   {t("terminal.disconnect")}
@@ -100,7 +124,7 @@ export default function TerminalDrawer({ config }) {
             </div>
           </div>
           <div className="flex-1 min-h-0 bg-[#0c0e14]">
-            {started && <Terminal key={generation} src={config.src} fontSize={config.fontSize} onStatus={setStatus} />}
+            {started && <Terminal key={generation} src={config.src} fontSize={fontSize} onStatus={setStatus} />}
           </div>
         </div>
       </div>

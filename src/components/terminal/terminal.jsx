@@ -12,8 +12,11 @@ const OUTPUT_BYTE = "0".charCodeAt(0);
 export default function Terminal({ src, fontSize, onStatus }) {
   const containerRef = useRef(null);
   const wsRef = useRef(null);
+  const termRef = useRef(null);
+  const fitAddonRef = useRef(null);
   const modifiersRef = useRef({ ctrl: false, alt: false });
   const onStatusRef = useRef(onStatus);
+  const mobileInputRef = useRef(null);
   onStatusRef.current = onStatus;
 
   const [modifiers, setModifiers] = useState({ ctrl: false, alt: false });
@@ -44,20 +47,38 @@ export default function Terminal({ src, fontSize, onStatus }) {
   };
 
   useEffect(() => {
+    const term = termRef.current;
+    const fitAddon = fitAddonRef.current;
+    if (!term || !fitAddon) return;
+    term.options.fontSize = fontSize ?? 14;
+    fitAddon.fit();
+    const ws = wsRef.current;
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(RESIZE + JSON.stringify({ columns: term.cols, rows: term.rows }));
+    }
+  }, [fontSize]);
+
+  useEffect(() => {
+    if (isTouch && status === "connected") {
+      mobileInputRef.current?.focus();
+    }
+  }, [isTouch, status]);
+
+  useEffect(() => {
     const node = containerRef.current;
     if (!src || !node) return undefined;
 
     let disposed = false;
     let term;
     let resizeObserver;
+    const touch = window.matchMedia?.("(pointer: coarse)")?.matches || "ontouchstart" in window;
 
-    // closing the socket makes ttyd terminate the shell process for this
-    // session, so no ghost sessions survive an explicit disconnect, the
-    // drawer being unmounted, or the page being closed
     const teardown = () => {
       resizeObserver?.disconnect();
       if (wsRef.current && wsRef.current.readyState <= WebSocket.OPEN) wsRef.current.close();
       wsRef.current = null;
+      termRef.current = null;
+      fitAddonRef.current = null;
       term?.dispose();
     };
 
@@ -79,6 +100,9 @@ export default function Terminal({ src, fontSize, onStatus }) {
       term.open(node);
       fitAddon.fit();
 
+      termRef.current = term;
+      fitAddonRef.current = fitAddon;
+
       const url = new URL(src);
       const wsProtocol = url.protocol === "https:" ? "wss:" : "ws:";
       const ws = new WebSocket(`${wsProtocol}//${url.host}${url.pathname.replace(/\/$/, "")}/ws`, ["tty"]);
@@ -89,7 +113,7 @@ export default function Terminal({ src, fontSize, onStatus }) {
         updateStatus("connected");
         ws.send(JSON.stringify({ AuthToken: "", columns: term.cols, rows: term.rows }));
         ws.send(RESIZE + JSON.stringify({ columns: term.cols, rows: term.rows }));
-        term.focus();
+        if (!touch) term.focus();
       };
       ws.onmessage = (event) => {
         const data = new Uint8Array(event.data);
@@ -102,7 +126,6 @@ export default function Terminal({ src, fontSize, onStatus }) {
       term.onData((data) => sendInput(consumeModifiers(data)));
 
       resizeObserver = new ResizeObserver(() => {
-        // skip while the drawer is hidden (display: none)
         if (!node.offsetWidth) return;
         fitAddon.fit();
         if (ws.readyState === WebSocket.OPEN) {
@@ -120,20 +143,62 @@ export default function Terminal({ src, fontSize, onStatus }) {
       teardown();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [src, fontSize]);
+  }, [src]);
+
+  const handleMobileKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendInput(consumeModifiers("\r"));
+    } else if (e.key === "Backspace") {
+      e.preventDefault();
+      sendInput("\x7f");
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      sendInput(consumeModifiers("\t"));
+    }
+  };
+
+  const handleMobileInput = (e) => {
+    const input = e.target;
+    const value = input.value;
+    if (value) {
+      sendInput(consumeModifiers(value));
+      requestAnimationFrame(() => {
+        input.value = "";
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col h-full w-full bg-[#0c0e14]">
       <div ref={containerRef} className="flex-1 min-h-0 p-1" />
       {isTouch && status === "connected" && (
-        <Toolbar
-          modifiers={modifiers}
-          onKey={sendInput}
-          onToggleModifier={(modifier) => {
-            modifiersRef.current = { ...modifiersRef.current, [modifier]: !modifiersRef.current[modifier] };
-            setModifiers(modifiersRef.current);
-          }}
-        />
+        <>
+          <div className="px-1 pb-1">
+            <input
+              ref={mobileInputRef}
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="send"
+              className="w-full bg-white/5 text-white/90 text-sm font-mono rounded-sm px-2 py-1.5 outline-none border border-white/10 placeholder:text-white/30"
+              placeholder="Type here..."
+              onKeyDown={handleMobileKeyDown}
+              onInput={handleMobileInput}
+            />
+          </div>
+          <Toolbar
+            modifiers={modifiers}
+            onKey={sendInput}
+            onToggleModifier={(modifier) => {
+              modifiersRef.current = { ...modifiersRef.current, [modifier]: !modifiersRef.current[modifier] };
+              setModifiers(modifiersRef.current);
+            }}
+          />
+        </>
       )}
     </div>
   );

@@ -409,7 +409,8 @@
   "tailmesh": {
     "devices": "Devices",
     "online": "{{online}}/{{total}} online",
-    "more": "+{{value}} more"
+    "more": "+{{value}} more",
+    "less": "Show less"
   },
   "tailscale": {
     "address": "Address",

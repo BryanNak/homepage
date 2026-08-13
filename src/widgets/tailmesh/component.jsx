@@ -2,6 +2,7 @@ import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
 import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
+import { useState } from "react";
 
 import useWidgetAPI from "utils/proxy/use-widget-api";
 
@@ -10,6 +11,7 @@ const DEFAULT_LIMIT = 8;
 export default function Component({ service }) {
   const { t } = useTranslation();
   const { widget } = service;
+  const [expanded, setExpanded] = useState(false);
 
   const { data: meshData, error: meshError } = useWidgetAPI(widget);
 
@@ -28,8 +30,8 @@ export default function Component({ service }) {
   // the proxy sorts self first, then online devices, so the sliced-off tail is
   // the least interesting part of the mesh
   const limit = widget.limit ?? DEFAULT_LIMIT;
-  const visibleDevices = meshData.devices.slice(0, limit);
-  const hiddenCount = meshData.devices.length - visibleDevices.length;
+  const hiddenCount = meshData.devices.length - limit;
+  const visibleDevices = expanded ? meshData.devices : meshData.devices.slice(0, limit);
 
   return (
     <Container service={service}>
@@ -48,7 +50,13 @@ export default function Component({ service }) {
           />
         ))}
         {hiddenCount > 0 && (
-          <div className="text-xs opacity-75 pl-2 pb-1">{t("tailmesh.more", { value: hiddenCount })}</div>
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs opacity-75 pl-2 pb-1 text-left hover:opacity-100 cursor-pointer"
+          >
+            {expanded ? t("tailmesh.less") : t("tailmesh.more", { value: hiddenCount })}
+          </button>
         )}
       </div>
     </Container>
