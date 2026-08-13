@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import "@xterm/xterm/css/xterm.css";
 import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next/pages";
 import Head from "next/head";
-import "@xterm/xterm/css/xterm.css";
 import "styles/globals.css";
 import "styles/manrope.css";
 import "styles/theme.css";

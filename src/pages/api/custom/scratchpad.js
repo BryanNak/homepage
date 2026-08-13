@@ -12,7 +12,10 @@ const MAX_TEXT_LENGTH = 256 * 1024;
 
 function passwordMatches(provided, master) {
   // hash both sides so timingSafeEqual gets equal-length buffers
-  const providedHash = crypto.createHash("sha256").update(String(provided ?? "")).digest();
+  const providedHash = crypto
+    .createHash("sha256")
+    .update(String(provided ?? ""))
+    .digest();
   const masterHash = crypto.createHash("sha256").update(master).digest();
   return crypto.timingSafeEqual(providedHash, masterHash);
 }

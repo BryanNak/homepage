@@ -34,7 +34,14 @@ describe("widgets/tailmesh/component", () => {
         total: 2,
         online: 1,
         devices: [
-          { name: "debian", dnsName: "debian.tailb901c6.ts.net", os: "linux", ip: "100.1.2.3", online: true, self: true },
+          {
+            name: "debian",
+            dnsName: "debian.tailb901c6.ts.net",
+            os: "linux",
+            ip: "100.1.2.3",
+            online: true,
+            self: true,
+          },
           { name: "phone", dnsName: "phone.tailb901c6.ts.net", os: "iOS", ip: "100.1.2.4", online: false, self: false },
         ],
       },

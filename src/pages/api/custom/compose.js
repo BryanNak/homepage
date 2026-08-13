@@ -99,7 +99,9 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, output: outputs.join("\n").slice(-4000) });
   } catch (error) {
     logger.error("compose action '%s' failed for stack '%s': %s", action, stack.name, error.message);
-    return res.status(500).json({ error: error.message, output: `${error.stdout ?? ""}${error.stderr ?? ""}`.slice(-4000) });
+    return res
+      .status(500)
+      .json({ error: error.message, output: `${error.stdout ?? ""}${error.stderr ?? ""}`.slice(-4000) });
   } finally {
     busy.delete(stack.dir);
   }

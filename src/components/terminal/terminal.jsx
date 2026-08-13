@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-import Toolbar from "./toolbar";
 import { applyModifiers } from "./keys";
+import Toolbar from "./toolbar";
 
 // ttyd websocket protocol: client sends "0"+data (input), "1"+json (resize);
 // server sends "0"+data (output), "1"+title, "2"+preferences
