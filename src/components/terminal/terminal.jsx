@@ -22,7 +22,6 @@ export default function Terminal({ src, fontSize, onStatus }) {
   const [modifiers, setModifiers] = useState({ ctrl: false, alt: false });
   const [status, setStatus] = useState("connecting");
   const [isTouch, setIsTouch] = useState(false);
-  const [showInput, setShowInput] = useState(true);
 
   const updateStatus = (nextStatus) => {
     setStatus(nextStatus);
@@ -176,40 +175,28 @@ export default function Terminal({ src, fontSize, onStatus }) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#0c0e14]">
+    <div className="flex flex-col h-full w-full bg-[#0c0e14] relative overscroll-contain">
       <div
         ref={containerRef}
-        className="flex-1 min-h-0 p-1"
-        onClick={
-          isTouch
-            ? () => {
-                setShowInput(true);
-                requestAnimationFrame(() => mobileInputRef.current?.focus());
-              }
-            : undefined
-        }
+        className="flex-1 min-h-0 p-1 touch-none"
+        onClick={isTouch ? () => mobileInputRef.current?.focus() : undefined}
       />
       {isTouch && status === "connected" && (
         <>
-          {showInput && (
-            <div className="px-1 pb-1">
-              <input
-                ref={mobileInputRef}
-                type="text"
-                inputMode="text"
-                autoComplete="off"
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
-                enterKeyHint="send"
-                className="w-full bg-white/5 text-white/90 text-sm font-mono rounded-sm px-2 py-1.5 outline-none border border-white/10 placeholder:text-white/30"
-                placeholder="Type here..."
-                onKeyDown={handleMobileKeyDown}
-                onInput={handleMobileInput}
-                onBlur={() => setShowInput(false)}
-              />
-            </div>
-          )}
+          <input
+            ref={mobileInputRef}
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="send"
+            aria-label="Terminal input"
+            className="absolute bottom-0 left-0 w-px h-px opacity-0"
+            onKeyDown={handleMobileKeyDown}
+            onInput={handleMobileInput}
+          />
           <Toolbar
             modifiers={modifiers}
             onKey={sendInput}

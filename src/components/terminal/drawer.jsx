@@ -78,7 +78,7 @@ export default function TerminalDrawer({ config }) {
           role="presentation"
           aria-hidden="true"
         />
-        <div className="absolute inset-x-2 bottom-2 top-14 sm:inset-x-10 sm:inset-y-16 flex flex-col rounded-md overflow-hidden shadow-xl bg-theme-100 dark:bg-theme-800">
+        <div className="absolute inset-x-2 bottom-2 top-14 sm:inset-x-10 sm:inset-y-16 flex flex-col rounded-md overflow-hidden shadow-xl bg-theme-100 dark:bg-theme-800 overscroll-contain">
           <div className="flex flex-row items-center justify-between px-3 py-2 text-xs">
             <div className="flex flex-row items-center">
               <span className="font-bold mr-3">{t("terminal.title")}</span>
