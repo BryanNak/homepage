@@ -27,6 +27,10 @@ import useWindowFocus from "utils/hooks/window-focus";
 import createLogger from "utils/logger";
 import themes from "utils/styles/themes";
 
+const TerminalDrawer = dynamic(() => import("components/terminal/drawer"), {
+  ssr: false,
+});
+
 const ThemeToggle = dynamic(() => import("components/toggles/theme"), {
   ssr: false,
 });
@@ -514,6 +518,8 @@ function Home({ initialSettings }) {
             {!settings.hideVersion && <Version disableUpdateCheck={settings.disableUpdateCheck} />}
           </div>
         </div>
+
+        {settings.terminal?.src && <TerminalDrawer config={settings.terminal} />}
       </div>
     </>
   );

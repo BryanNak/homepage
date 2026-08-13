@@ -155,6 +155,13 @@
         "leech": "Leech",
         "seed": "Seed"
     },
+    "forgejo": {
+        "configure": "Set a repository (owner/repo) in the widget config",
+        "pulls": "Open PRs",
+        "commits": "Commits",
+        "runs": "Actions",
+        "empty": "None"
+    },
     "freshrss": {
         "subscriptions": "Subscriptions",
         "unread": "Unread"
@@ -183,6 +190,23 @@
         "upstreams": "Upstreams",
         "requests": "Current requests",
         "requests_failed": "Failed requests"
+    },
+    "composestacks": {
+        "stacks": "Stacks",
+        "up": "Start",
+        "down": "Stop",
+        "update": "Update",
+        "uping": "Starting {{stack}}…",
+        "downing": "Stopping {{stack}}…",
+        "updateing": "Updating {{stack}}…",
+        "done": "{{stack}}: done",
+        "confirmDown": "Stop stack {{stack}}?"
+    },
+    "certwatch": {
+        "certificates": "Certificates",
+        "days": "{{value}} days",
+        "expired": "Expired",
+        "error": "Error"
     },
     "changedetectionio": {
         "totalObserved": "Total Observed",
@@ -351,6 +375,27 @@
       "downloadedunread": "Downloaded & Unread",
       "nondownloadedread": "Non-Downloaded & Read",
       "nondownloadedunread": "Non-Downloaded & Unread"
+    },
+    "scratchpad": {
+        "password": "Master password",
+        "unlock": "Unlock",
+        "lock": "Lock",
+        "save": "Save",
+        "saved": "Saved"
+    },
+    "terminal": {
+        "title": "Terminal",
+        "idle": "Not connected",
+        "connecting": "Connecting",
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "reconnect": "Reconnect",
+        "disconnect": "Disconnect",
+        "hide": "Hide"
+    },
+    "tailmesh": {
+        "devices": "Devices",
+        "online": "{{online}}/{{total}} online"
     },
     "tailscale": {
         "address": "Address",

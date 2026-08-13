@@ -14,6 +14,7 @@ import booklore from "./booklore/widget";
 import caddy from "./caddy/widget";
 import calendar from "./calendar/widget";
 import calibreweb from "./calibreweb/widget";
+import certwatch from "./certwatch/widget";
 import changedetectionio from "./changedetectionio/widget";
 import channelsdvrserver from "./channelsdvrserver/widget";
 import checkmk from "./checkmk/widget";
@@ -35,6 +36,7 @@ import filebrowser from "./filebrowser/widget";
 import fileflows from "./fileflows/widget";
 import firefly from "./firefly/widget";
 import flood from "./flood/widget";
+import forgejo from "./forgejo/widget";
 import freshrss from "./freshrss/widget";
 import frigate from "./frigate/widget";
 import fritzbox from "./fritzbox/widget";
@@ -131,6 +133,7 @@ import strelaysrv from "./strelaysrv/widget";
 import suwayomi from "./suwayomi/widget";
 import swagdashboard from "./swagdashboard/widget";
 import syncthing from "./syncthing/widget";
+import tailmesh from "./tailmesh/widget";
 import tailscale from "./tailscale/widget";
 import tandoor from "./tandoor/widget";
 import tautulli from "./tautulli/widget";
@@ -174,6 +177,7 @@ const widgets = {
   beszel,
   caddy,
   calibreweb,
+  certwatch,
   changedetectionio,
   channelsdvrserver,
   checkmk,
@@ -195,6 +199,7 @@ const widgets = {
   fileflows,
   firefly,
   flood,
+  forgejo,
   freshrss,
   frigate,
   fritzbox,
@@ -296,6 +301,7 @@ const widgets = {
   swagdashboard,
   suwayomi,
   syncthing,
+  tailmesh,
   tailscale,
   tandoor,
   tautulli,

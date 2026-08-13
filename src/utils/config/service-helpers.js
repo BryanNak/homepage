@@ -279,6 +279,9 @@ export function cleanServiceGroups(groups) {
           view,
           timezone,
 
+          // certwatch
+          warning,
+
           // coinmarketcap
           currency,
           defaultinterval,
@@ -318,6 +321,9 @@ export function cleanServiceGroups(groups) {
           enableUser,
           expandOneStreamToTwoRows,
           showEpisodeNumber,
+
+          // forgejo
+          repository,
 
           // frigate
           enableRecentEvents,
@@ -490,6 +496,14 @@ export function cleanServiceGroups(groups) {
           if (symbols) widget.symbols = symbols;
           if (slugs) widget.slugs = slugs;
           if (defaultinterval) widget.defaultinterval = defaultinterval;
+        }
+
+        if (type === "certwatch") {
+          if (warning !== undefined) widget.warning = warning;
+        }
+
+        if (type === "forgejo") {
+          if (repository) widget.repository = repository;
         }
 
         if (limit24h !== undefined) {
