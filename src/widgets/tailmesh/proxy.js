@@ -87,7 +87,11 @@ export default async function tailmeshProxyHandler(req, res) {
     const suffix = status.MagicDNSSuffix;
     const devices = [
       toDevice(status.Self, suffix, true),
-      ...Object.values(status.Peer ?? {}).map((peer) => toDevice(peer, suffix)),
+      // sharee nodes belong to users the device was shared to, and their hostnames are
+      // masked ("device-of-shared-to-user"); the tailscale CLI hides them too
+      ...Object.values(status.Peer ?? {})
+        .filter((peer) => !peer.ShareeNode)
+        .map((peer) => toDevice(peer, suffix)),
     ].sort((a, b) => b.self - a.self || b.online - a.online || a.name.localeCompare(b.name));
 
     return res.status(200).json({
