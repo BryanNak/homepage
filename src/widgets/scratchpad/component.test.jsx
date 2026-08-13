@@ -40,6 +40,18 @@ describe("widgets/scratchpad/component", () => {
     );
   });
 
+  it("shows the expand button after unlocking", async () => {
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ text: "notes" }) });
+
+    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+
+    fireEvent.change(screen.getByPlaceholderText("scratchpad.password"), { target: { value: "hunter2" } });
+    fireEvent.click(screen.getByText("scratchpad.unlock"));
+
+    await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("notes"));
+    expect(screen.getByTitle("scratchpad.expand")).toBeInTheDocument();
+  });
+
   it("shows the error and stays locked on a wrong password", async () => {
     fetch.mockResolvedValue({ ok: false, status: 401, json: async () => ({ error: "Wrong password" }) });
 

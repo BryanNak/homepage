@@ -1,6 +1,6 @@
-import classNames from "classnames";
 import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
+import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
 
 import useWidgetAPI from "utils/proxy/use-widget-api";
@@ -20,18 +20,6 @@ function Section({ title, children }) {
     <div className="flex flex-col w-full">
       <div className="text-xs opacity-75 font-bold pl-2 pt-1">{title}</div>
       {children}
-    </div>
-  );
-}
-
-function Row({ left, right, rightClass, title }) {
-  return (
-    <div
-      title={title}
-      className="bg-theme-200/50 dark:bg-theme-900/20 rounded-sm m-1 flex flex-row items-center justify-between p-1 text-xs"
-    >
-      <div className="font-thin pl-1 truncate">{left}</div>
-      <div className={classNames("pl-2 pr-1 shrink-0", rightClass)}>{right}</div>
     </div>
   );
 }
@@ -83,48 +71,39 @@ export default function Component({ service }) {
           <>
             <Section title={`${t("forgejo.pulls")} (${pulls.length})`}>
               {pulls.slice(0, 3).map((pull) => (
-                <Row
+                <ListRow
                   key={pull.number}
                   left={`#${pull.number} ${pull.title}`}
                   right={pull.user?.login}
                   title={pull.title}
                 />
               ))}
-              {!pulls.length && <Row left={t("forgejo.empty")} />}
+              {!pulls.length && <ListRow left={t("forgejo.empty")} />}
             </Section>
 
             <Section title={t("forgejo.commits")}>
               {commits.map((commit) => (
-                <Row
+                <ListRow
                   key={commit.sha}
                   left={commit.commit?.message?.split("\n")[0]}
                   right={t("common.relativeDate", { value: commit.commit?.committer?.date ?? commit.created })}
                   title={commit.sha?.slice(0, 10)}
                 />
               ))}
-              {!commits.length && <Row left={t("forgejo.empty")} />}
+              {!commits.length && <ListRow left={t("forgejo.empty")} />}
             </Section>
 
             <Section title={t("forgejo.runs")}>
               {runsData.runs.map((run) => (
-                <Row
+                <ListRow
                   key={run.id}
                   title={run.status}
-                  left={
-                    <span className="flex flex-row items-center min-w-0">
-                      <span
-                        className={classNames(
-                          "inline-block w-2 h-2 rounded-full mr-2 shrink-0",
-                          RUN_STATUS_STYLES[run.status] ?? "bg-gray-400",
-                        )}
-                      />
-                      <span className="truncate">{run.display_title ?? run.name}</span>
-                    </span>
-                  }
+                  dot={RUN_STATUS_STYLES[run.status] ?? "bg-gray-400"}
+                  left={run.display_title ?? run.name}
                   right={run.head_branch}
                 />
               ))}
-              {!runsData.runs.length && <Row left={t("forgejo.empty")} />}
+              {!runsData.runs.length && <ListRow left={t("forgejo.empty")} />}
             </Section>
           </>
         )}

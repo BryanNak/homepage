@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
+import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
 
 import useWidgetAPI from "utils/proxy/use-widget-api";
@@ -42,15 +43,13 @@ export default function Component({ service }) {
           }
 
           return (
-            <div
+            <ListRow
               key={cert.domain}
-              className="bg-theme-200/50 dark:bg-theme-900/20 rounded-sm m-1 flex-1 flex flex-row items-center justify-between p-1 text-xs"
-            >
-              <div className="font-thin pl-2 truncate">{cert.domain}</div>
-              <div className={classNames("font-bold mr-2 shrink-0", statusClass)} title={cert.validTo}>
-                {status}
-              </div>
-            </div>
+              title={cert.validTo}
+              left={cert.domain}
+              right={status}
+              rightClass={classNames("font-bold", statusClass)}
+            />
           );
         })}
       </div>

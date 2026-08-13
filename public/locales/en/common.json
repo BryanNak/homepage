@@ -212,6 +212,13 @@
         "expired": "Expired",
         "error": "Error"
     },
+    "diskhealth": {
+        "disks": "Disks",
+        "standby": "Standby",
+        "failed": "Failed",
+        "error": "Error",
+        "temp": "{{value}}°C"
+    },
     "changedetectionio": {
         "totalObserved": "Total Observed",
         "diffsDetected": "Diffs Detected"
@@ -385,7 +392,9 @@
         "unlock": "Unlock",
         "lock": "Lock",
         "save": "Save",
-        "saved": "Saved"
+        "saved": "Saved",
+        "expand": "Expand",
+        "close": "Close"
     },
     "terminal": {
         "title": "Terminal",
@@ -399,7 +408,8 @@
     },
     "tailmesh": {
         "devices": "Devices",
-        "online": "{{online}}/{{total}} online"
+        "online": "{{online}}/{{total}} online",
+        "more": "+{{value}} more"
     },
     "tailscale": {
         "address": "Address",

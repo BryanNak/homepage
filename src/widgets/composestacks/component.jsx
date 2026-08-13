@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
+import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
 import { useCallback, useEffect, useState } from "react";
 
@@ -90,57 +91,57 @@ export default function Component({ service }) {
           const running = !stack.error && stack.running > 0;
           const busyHere = busyStack === stack.name;
           return (
-            <div
+            <ListRow
               key={stack.name}
-              className="bg-theme-200/50 dark:bg-theme-900/20 rounded-sm m-1 flex flex-row items-center justify-between p-1 text-xs"
-            >
-              <div className="flex flex-row items-center min-w-0 pl-1">
-                <span
-                  className={classNames(
-                    "inline-block w-2 h-2 rounded-full mr-2 shrink-0",
-                    stack.error ? "bg-amber-400" : running ? "bg-emerald-400" : "bg-gray-400",
-                    busyHere && "animate-pulse",
-                  )}
-                />
-                <span className="truncate" title={stack.error ?? `${stack.running}/${stack.total} running`}>
-                  {stack.name}
-                </span>
-                {!stack.error && (
-                  <span className="opacity-75 ml-2 shrink-0">
-                    {stack.running}/{stack.total}
+              dot={classNames(
+                stack.error ? "bg-amber-400" : running ? "bg-emerald-400" : "bg-gray-400",
+                busyHere && "animate-pulse",
+              )}
+              left={
+                <>
+                  <span className="truncate" title={stack.error ?? `${stack.running}/${stack.total} running`}>
+                    {stack.name}
                   </span>
-                )}
-              </div>
-              <div className="flex flex-row gap-1 pl-2 shrink-0">
-                <button
-                  type="button"
-                  className={buttonClass}
-                  disabled={busyStack !== null}
-                  onClick={() => runAction(stack.name, "up")}
-                  title={t("composestacks.up")}
-                >
-                  ▶
-                </button>
-                <button
-                  type="button"
-                  className={buttonClass}
-                  disabled={busyStack !== null}
-                  onClick={() => runAction(stack.name, "down")}
-                  title={t("composestacks.down")}
-                >
-                  ■
-                </button>
-                <button
-                  type="button"
-                  className={buttonClass}
-                  disabled={busyStack !== null}
-                  onClick={() => runAction(stack.name, "update")}
-                  title={t("composestacks.update")}
-                >
-                  ⟳
-                </button>
-              </div>
-            </div>
+                  {!stack.error && (
+                    <span className="opacity-75 ml-2 shrink-0">
+                      {stack.running}/{stack.total}
+                    </span>
+                  )}
+                </>
+              }
+              rightClass="flex flex-row gap-1"
+              right={
+                <>
+                  <button
+                    type="button"
+                    className={buttonClass}
+                    disabled={busyStack !== null}
+                    onClick={() => runAction(stack.name, "up")}
+                    title={t("composestacks.up")}
+                  >
+                    ▶
+                  </button>
+                  <button
+                    type="button"
+                    className={buttonClass}
+                    disabled={busyStack !== null}
+                    onClick={() => runAction(stack.name, "down")}
+                    title={t("composestacks.down")}
+                  >
+                    ■
+                  </button>
+                  <button
+                    type="button"
+                    className={buttonClass}
+                    disabled={busyStack !== null}
+                    onClick={() => runAction(stack.name, "update")}
+                    title={t("composestacks.update")}
+                  >
+                    ⟳
+                  </button>
+                </>
+              }
+            />
           );
         })}
         {message && <div className="text-xs opacity-75 pl-2 pb-1">{message}</div>}

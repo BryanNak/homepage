@@ -29,6 +29,7 @@ const components = {
   customapi: dynamic(() => import("./customapi/component")),
   deluge: dynamic(() => import("./deluge/component")),
   develancacheui: dynamic(() => import("./develancacheui/component")),
+  diskhealth: dynamic(() => import("./diskhealth/component")),
   diskstation: dynamic(() => import("./diskstation/component")),
   duplicati: dynamic(() => import("./duplicati/component")),
   dispatcharr: dynamic(() => import("./dispatcharr/component")),

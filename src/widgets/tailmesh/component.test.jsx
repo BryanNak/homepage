@@ -56,5 +56,25 @@ describe("widgets/tailmesh/component", () => {
     expect(screen.getByText("debian")).toBeInTheDocument();
     expect(screen.getByText("phone")).toBeInTheDocument();
     expect(screen.getByText("iOS")).toBeInTheDocument();
+    expect(screen.queryByText("tailmesh.more")).not.toBeInTheDocument();
+  });
+
+  it("caps the device list at the configured limit and shows a more row", () => {
+    const devices = Array.from({ length: 10 }, (_, i) => ({
+      name: `dev${i}`,
+      os: "linux",
+      ip: `100.1.2.${i}`,
+      online: true,
+      self: i === 0,
+    }));
+    useWidgetAPI.mockReturnValue({ data: { total: 10, online: 10, devices }, error: undefined });
+
+    renderWithProviders(<Component service={{ widget: { type: "tailmesh", limit: 4 } }} />, {
+      settings: { hideErrors: false },
+    });
+
+    expect(screen.getByText("dev3")).toBeInTheDocument();
+    expect(screen.queryByText("dev4")).not.toBeInTheDocument();
+    expect(screen.getByText("tailmesh.more")).toBeInTheDocument();
   });
 });

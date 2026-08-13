@@ -279,7 +279,7 @@ export function cleanServiceGroups(groups) {
           view,
           timezone,
 
-          // certwatch
+          // certwatch, diskhealth
           warning,
 
           // coinmarketcap
@@ -324,6 +324,9 @@ export function cleanServiceGroups(groups) {
 
           // forgejo
           repository,
+
+          // tailmesh
+          limit,
 
           // frigate
           enableRecentEvents,
@@ -498,12 +501,16 @@ export function cleanServiceGroups(groups) {
           if (defaultinterval) widget.defaultinterval = defaultinterval;
         }
 
-        if (type === "certwatch") {
+        if (type === "certwatch" || type === "diskhealth") {
           if (warning !== undefined) widget.warning = warning;
         }
 
         if (type === "forgejo") {
           if (repository) widget.repository = repository;
+        }
+
+        if (type === "tailmesh") {
+          if (limit !== undefined) widget.limit = limit;
         }
 
         if (limit24h !== undefined) {

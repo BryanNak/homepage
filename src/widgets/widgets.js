@@ -24,6 +24,7 @@ import crowdsec from "./crowdsec/widget";
 import customapi from "./customapi/widget";
 import deluge from "./deluge/widget";
 import develancacheui from "./develancacheui/widget";
+import diskhealth from "./diskhealth/widget";
 import diskstation from "./diskstation/widget";
 import dispatcharr from "./dispatcharr/widget";
 import dockhand from "./dockhand/widget";
@@ -187,6 +188,7 @@ const widgets = {
   customapi,
   deluge,
   develancacheui,
+  diskhealth,
   diskstation,
   duplicati,
   dispatcharr,
