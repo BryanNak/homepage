@@ -180,7 +180,14 @@ export default function Terminal({ src, fontSize, onStatus }) {
       <div
         ref={containerRef}
         className="flex-1 min-h-0 p-1"
-        onClick={isTouch ? () => { setShowInput(true); requestAnimationFrame(() => mobileInputRef.current?.focus()); } : undefined}
+        onClick={
+          isTouch
+            ? () => {
+                setShowInput(true);
+                requestAnimationFrame(() => mobileInputRef.current?.focus());
+              }
+            : undefined
+        }
       />
       {isTouch && status === "connected" && (
         <>
