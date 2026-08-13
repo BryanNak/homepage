@@ -469,7 +469,10 @@ function Home({ initialSettings }) {
               `backdrop-blur${settings.cardBlur.length ? "-" : ""}${settings.cardBlur}`,
           )}
         >
-          <div id="widgets-wrap" className={classNames("flex flex-row w-full flex-wrap justify-between gap-x-2 gap-y-2")}>
+          <div
+            id="widgets-wrap"
+            className={classNames("flex flex-row w-full flex-wrap justify-between gap-x-2 gap-y-2")}
+          >
             {widgets && (
               <>
                 {widgets
