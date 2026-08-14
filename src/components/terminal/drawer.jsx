@@ -17,7 +17,7 @@ const MIN_FONT_SIZE = 8;
 const MAX_FONT_SIZE = 24;
 const FONT_SIZE_STEP = 2;
 
-export default function TerminalDrawer({ config }) {
+export default function TerminalDrawer({ config, showRef }) {
   const { t } = useTranslation();
 
   const [open, setOpen] = useState(false);
@@ -30,6 +30,8 @@ export default function TerminalDrawer({ config }) {
     setStarted(true);
     setOpen(true);
   };
+
+  if (showRef) showRef.current = show;
 
   const disconnect = () => {
     setStarted(false);

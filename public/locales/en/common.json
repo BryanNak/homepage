@@ -577,7 +577,8 @@
     "custom": "Custom",
     "visit": "Visit",
     "url": "URL",
-    "searchsuggestion": "Suggestion"
+    "searchsuggestion": "Suggestion",
+    "terminal": "Terminal"
   },
   "wmo": {
     "0-day": "Sunny",

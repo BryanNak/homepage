@@ -13,7 +13,7 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { BiError } from "react-icons/bi";
 import useSWR, { SWRConfig } from "swr";
 import { ColorContext } from "utils/contexts/color";
@@ -256,6 +256,8 @@ function Home({ initialSettings }) {
 
   const [searching, setSearching] = useState(false);
   const [searchString, setSearchString] = useState("");
+  const terminalShowRef = useRef(null);
+  const onOpenTerminal = useCallback(() => terminalShowRef.current?.(), []);
   const headerStyle = settings?.headerStyle || "underlined";
 
   useEffect(() => {
@@ -458,6 +460,7 @@ function Home({ initialSettings }) {
           setSearchString={setSearchString}
           isOpen={searching}
           setSearching={setSearching}
+          onOpenTerminal={settings.terminal?.src ? onOpenTerminal : undefined}
         />
         <div
           id="information-widgets"
@@ -519,7 +522,7 @@ function Home({ initialSettings }) {
           </div>
         </div>
 
-        {settings.terminal?.src && <TerminalDrawer config={settings.terminal} />}
+        {settings.terminal?.src && <TerminalDrawer config={settings.terminal} showRef={terminalShowRef} />}
       </div>
     </>
   );

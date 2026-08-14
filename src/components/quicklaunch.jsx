@@ -15,7 +15,14 @@ const MOBILE_BUTTON_POSITIONS = {
   "bottom-right": "bottom-4 right-4",
 };
 
-export default function QuickLaunch({ servicesAndBookmarks, searchString, setSearchString, isOpen, setSearching }) {
+export default function QuickLaunch({
+  servicesAndBookmarks,
+  searchString,
+  setSearchString,
+  isOpen,
+  setSearching,
+  onOpenTerminal,
+}) {
   const { t } = useTranslation();
 
   const { settings } = useContext(SettingsContext);
@@ -63,6 +70,10 @@ export default function QuickLaunch({ servicesAndBookmarks, searchString, setSea
 
   function openCurrentItem(newWindow) {
     const result = results[currentItemIndex];
+    if (result.action) {
+      result.action();
+      return;
+    }
     window.open(
       result.href,
       newWindow ? "_blank" : (result.target ?? searchProvider?.target ?? settings.target ?? "_blank"),
@@ -154,6 +165,15 @@ export default function QuickLaunch({ servicesAndBookmarks, searchString, setSea
 
       if (searchDescriptions) {
         newResults = newResults.sort((a, b) => b.priority - a.priority);
+      }
+
+      if (onOpenTerminal && t("terminal.title").toLowerCase().includes(searchString)) {
+        newResults.push({
+          name: t("terminal.title"),
+          type: "terminal",
+          abbr: ">_",
+          action: onOpenTerminal,
+        });
       }
 
       if (searchProvider) {
