@@ -137,7 +137,9 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
 
       if (touch) {
         let lastTouchY = null;
-        const onTouchStart = (e) => { lastTouchY = e.touches[0].clientY; };
+        const onTouchStart = (e) => {
+          lastTouchY = e.touches[0].clientY;
+        };
         const onTouchMove = (e) => {
           e.preventDefault();
           if (lastTouchY !== null) {
@@ -148,7 +150,9 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
             if (lines) term.scrollLines(lines);
           }
         };
-        const onTouchEnd = () => { lastTouchY = null; };
+        const onTouchEnd = () => {
+          lastTouchY = null;
+        };
         node.addEventListener("touchstart", onTouchStart, { passive: true });
         node.addEventListener("touchmove", onTouchMove, { passive: false });
         node.addEventListener("touchend", onTouchEnd, { passive: true });

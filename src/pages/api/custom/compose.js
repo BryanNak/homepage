@@ -67,11 +67,10 @@ async function handleLogs(req, res, stacks) {
   if (!stack) return res.status(400).json({ error: "Unknown stack" });
 
   try {
-    const { stdout } = await execFileAsync(
-      "docker",
-      ["compose", "logs", "--tail", String(tail || 200), "--no-color"],
-      { ...EXEC_OPTIONS, cwd: stack.dir },
-    );
+    const { stdout } = await execFileAsync("docker", ["compose", "logs", "--tail", String(tail || 200), "--no-color"], {
+      ...EXEC_OPTIONS,
+      cwd: stack.dir,
+    });
     return res.status(200).json({ logs: stdout.slice(-64000) });
   } catch (error) {
     logger.error("compose logs failed for stack '%s': %s", stack.name, error.message);

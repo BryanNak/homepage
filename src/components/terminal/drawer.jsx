@@ -124,7 +124,9 @@ export default function TerminalDrawer({ config }) {
             </div>
           </div>
           <div className="flex-1 min-h-0 bg-[#0c0e14]">
-            {started && <Terminal key={generation} src={config.src} fontSize={fontSize} cwd={config.cwd} onStatus={setStatus} />}
+            {started && (
+              <Terminal key={generation} src={config.src} fontSize={fontSize} cwd={config.cwd} onStatus={setStatus} />
+            )}
           </div>
         </div>
       </div>
