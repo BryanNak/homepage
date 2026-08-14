@@ -204,7 +204,12 @@
     "downing": "Stopping {{stack}}…",
     "updateing": "Updating {{stack}}…",
     "done": "{{stack}}: done",
-    "confirmDown": "Stop stack {{stack}}?"
+    "confirmDown": "Stop stack {{stack}}?",
+    "logs": "Logs",
+    "logs_title": "{{stack}} logs",
+    "close": "Close",
+    "loading": "Loading…",
+    "dismiss": "Dismiss"
   },
   "certwatch": {
     "certificates": "Certificates",

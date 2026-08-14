@@ -3,10 +3,61 @@ import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
 import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const buttonClass =
   "bg-theme-200/50 dark:bg-theme-900/40 hover:bg-theme-300/50 dark:hover:bg-theme-900/60 disabled:opacity-40 disabled:cursor-not-allowed rounded-sm px-2 py-0.5 text-xs cursor-pointer";
+
+function LogsModal({ stackName, baseUrl, onClose }) {
+  const { t } = useTranslation();
+  const [logs, setLogs] = useState(null);
+  const [error, setError] = useState(null);
+  const preRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      const response = await fetch(`${baseUrl}&logs&stack=${encodeURIComponent(stackName)}&tail=200`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
+      setLogs(data.logs);
+      setError(null);
+    } catch (fetchError) {
+      setError(fetchError.message);
+    }
+  }, [baseUrl, stackName]);
+
+  useEffect(() => {
+    fetchLogs();
+    intervalRef.current = setInterval(fetchLogs, 5000);
+    return () => clearInterval(intervalRef.current);
+  }, [fetchLogs]);
+
+  useEffect(() => {
+    if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight;
+  }, [logs]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} role="presentation" aria-hidden="true" />
+      <div className="relative w-[90vw] max-w-3xl h-[70vh] flex flex-col rounded-md overflow-hidden shadow-xl bg-theme-100 dark:bg-theme-800">
+        <div className="flex flex-row items-center justify-between px-3 py-2 text-xs shrink-0">
+          <span className="font-bold">{t("composestacks.logs_title", { stack: stackName })}</span>
+          <button type="button" className={buttonClass} onClick={onClose}>
+            {t("composestacks.close")}
+          </button>
+        </div>
+        <pre
+          ref={preRef}
+          className="flex-1 min-h-0 overflow-auto p-2 m-1 rounded-sm bg-black/80 text-white/90 text-[10px] leading-tight font-mono whitespace-pre-wrap break-all"
+        >
+          {error && <span className="text-rose-400">{error}</span>}
+          {logs ?? t("composestacks.loading")}
+        </pre>
+      </div>
+    </div>
+  );
+}
 
 export default function Component({ service }) {
   const { t } = useTranslation();
@@ -16,6 +67,8 @@ export default function Component({ service }) {
   const [error, setError] = useState(null);
   const [busyStack, setBusyStack] = useState(null);
   const [message, setMessage] = useState(null);
+  const [actionOutput, setActionOutput] = useState(null);
+  const [logsStack, setLogsStack] = useState(null);
 
   const baseUrl = `/api/custom/compose?${new URLSearchParams({
     group: widget.service_group,
@@ -45,6 +98,7 @@ export default function Component({ service }) {
     if (action === "down" && !window.confirm(t("composestacks.confirmDown", { stack: stackName }))) return;
     setBusyStack(stackName);
     setMessage(t(`composestacks.${action}ing`, { stack: stackName }));
+    setActionOutput(null);
     try {
       const response = await fetch("/api/custom/compose", {
         method: "POST",
@@ -60,6 +114,7 @@ export default function Component({ service }) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
       setMessage(t("composestacks.done", { stack: stackName }));
+      if (data.output) setActionOutput(data.output);
     } catch (actionError) {
       setMessage(actionError.message);
     } finally {
@@ -112,6 +167,16 @@ export default function Component({ service }) {
               rightClass="flex flex-row gap-1"
               right={
                 <>
+                  {running && (
+                    <button
+                      type="button"
+                      className={buttonClass}
+                      onClick={() => setLogsStack(stack.name)}
+                      title={t("composestacks.logs")}
+                    >
+                      ☰
+                    </button>
+                  )}
                   <button
                     type="button"
                     className={buttonClass}
@@ -145,7 +210,22 @@ export default function Component({ service }) {
           );
         })}
         {message && <div className="text-xs opacity-75 pl-2 pb-1">{message}</div>}
+        {actionOutput && (
+          <div className="m-1 rounded-sm overflow-hidden">
+            <pre className="overflow-auto max-h-32 p-1.5 bg-black/80 text-white/80 text-[10px] leading-tight font-mono whitespace-pre-wrap break-all">
+              {actionOutput}
+            </pre>
+            <button
+              type="button"
+              className="w-full text-[10px] opacity-50 hover:opacity-75 py-0.5 cursor-pointer"
+              onClick={() => setActionOutput(null)}
+            >
+              {t("composestacks.dismiss")}
+            </button>
+          </div>
+        )}
       </div>
+      {logsStack && <LogsModal stackName={logsStack} baseUrl={baseUrl} onClose={() => setLogsStack(null)} />}
     </Container>
   );
 }

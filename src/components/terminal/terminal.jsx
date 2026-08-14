@@ -9,7 +9,7 @@ const INPUT = "0";
 const RESIZE = "1";
 const OUTPUT_BYTE = "0".charCodeAt(0);
 
-export default function Terminal({ src, fontSize, onStatus }) {
+export default function Terminal({ src, fontSize, cwd, onStatus }) {
   const containerRef = useRef(null);
   const wsRef = useRef(null);
   const termRef = useRef(null);
@@ -119,6 +119,11 @@ export default function Terminal({ src, fontSize, onStatus }) {
         ws.send(JSON.stringify({ AuthToken: "", columns: term.cols, rows: term.rows }));
         ws.send(RESIZE + JSON.stringify({ columns: term.cols, rows: term.rows }));
         if (!touch) term.focus();
+        if (cwd) {
+          setTimeout(() => {
+            if (ws.readyState === WebSocket.OPEN) ws.send(INPUT + `cd ${cwd} && clear\r`);
+          }, 150);
+        }
       };
       ws.onmessage = (event) => {
         const data = new Uint8Array(event.data);
@@ -129,6 +134,25 @@ export default function Terminal({ src, fontSize, onStatus }) {
       };
 
       term.onData((data) => sendInput(consumeModifiers(data)));
+
+      if (touch) {
+        let lastTouchY = null;
+        const onTouchStart = (e) => { lastTouchY = e.touches[0].clientY; };
+        const onTouchMove = (e) => {
+          e.preventDefault();
+          if (lastTouchY !== null) {
+            const deltaY = lastTouchY - e.touches[0].clientY;
+            lastTouchY = e.touches[0].clientY;
+            const lineHeight = node.clientHeight / (term.rows || 24);
+            const lines = Math.round(deltaY / lineHeight);
+            if (lines) term.scrollLines(lines);
+          }
+        };
+        const onTouchEnd = () => { lastTouchY = null; };
+        node.addEventListener("touchstart", onTouchStart, { passive: true });
+        node.addEventListener("touchmove", onTouchMove, { passive: false });
+        node.addEventListener("touchend", onTouchEnd, { passive: true });
+      }
 
       resizeObserver = new ResizeObserver(() => {
         if (!node.offsetWidth) return;
@@ -178,7 +202,7 @@ export default function Terminal({ src, fontSize, onStatus }) {
     <div className="flex flex-col h-full w-full bg-[#0c0e14] relative overscroll-contain">
       <div
         ref={containerRef}
-        className="flex-1 min-h-0 p-1 touch-none"
+        className="flex-1 min-h-0 p-1"
         onClick={isTouch ? () => mobileInputRef.current?.focus() : undefined}
       />
       {isTouch && status === "connected" && (

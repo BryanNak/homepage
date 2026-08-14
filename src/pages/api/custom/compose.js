@@ -61,6 +61,24 @@ async function stackStatus(stack) {
   }
 }
 
+async function handleLogs(req, res, stacks) {
+  const { stack: stackName, tail } = req.query;
+  const stack = stacks.find((s) => s.name === stackName);
+  if (!stack) return res.status(400).json({ error: "Unknown stack" });
+
+  try {
+    const { stdout } = await execFileAsync(
+      "docker",
+      ["compose", "logs", "--tail", String(tail || 200), "--no-color"],
+      { ...EXEC_OPTIONS, cwd: stack.dir },
+    );
+    return res.status(200).json({ logs: stdout.slice(-64000) });
+  } catch (error) {
+    logger.error("compose logs failed for stack '%s': %s", stack.name, error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 export default async function handler(req, res) {
   const stacks = await getStacks(req);
   if (!stacks) {
@@ -68,6 +86,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "GET") {
+    if (req.query.logs !== undefined) return handleLogs(req, res, stacks);
     return res.status(200).json({ stacks: await Promise.all(stacks.map(stackStatus)) });
   }
 
