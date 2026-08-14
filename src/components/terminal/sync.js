@@ -104,7 +104,9 @@ export default function createTerminalSync({ src, cwd, onOutput, onStatus }) {
     if (msg.from === selfId) return;
 
     if (role === "leader") {
-      if (msg.type === "input") {
+      if (msg.type === "leader-check") {
+        broadcast({ type: "leader-ack" });
+      } else if (msg.type === "input") {
         if (ws?.readyState === WebSocket.OPEN) ws.send(`0${msg.data}`);
       } else if (msg.type === "buffer-request") {
         const combined = new Uint8Array(bufferBytes);

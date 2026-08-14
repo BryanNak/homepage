@@ -91,7 +91,7 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: "HOMEPAGE_SCRATCHPAD_PASSWORD is not set" });
   }
 
-  const { action, password, text, id } = req.body ?? {};
+  const { action, password, text, id, ids } = req.body ?? {};
 
   if (!passwordMatches(password, master)) {
     return res.status(401).json({ error: "Wrong password" });
@@ -149,6 +149,19 @@ export default async function handler(req, res) {
       blocks.splice(idx, 1);
       await writeBlocks(blocks, master);
       return res.status(200).json({ deleted: true });
+    });
+  }
+
+  if (action === "delete-many") {
+    if (!Array.isArray(ids) || ids.length === 0 || ids.some((i) => typeof i !== "string")) {
+      return res.status(400).json({ error: "Invalid ids" });
+    }
+    return withFileLock(async () => {
+      const blocks = await readBlocks(master);
+      const idSet = new Set(ids);
+      const remaining = blocks.filter((b) => !idSet.has(b.id));
+      await writeBlocks(remaining, master);
+      return res.status(200).json({ deleted: blocks.length - remaining.length });
     });
   }
 

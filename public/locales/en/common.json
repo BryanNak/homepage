@@ -399,7 +399,9 @@
     "expand": "Expand",
     "close": "Close",
     "addNote": "Add a note...",
-    "empty": "No notes yet"
+    "empty": "No notes yet",
+    "select": "Select",
+    "deleteSelected": "Delete {{count}} selected"
   },
   "terminal": {
     "title": "Terminal",

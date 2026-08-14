@@ -22,21 +22,42 @@ function timeAgo(timestamp) {
   return `${months}mo ago`;
 }
 
-function NoteBlock({ block, onDelete, compact }) {
+function NoteBlock({ block, onDelete, selectable, selected, onToggle }) {
   return (
-    <div className={blockClass}>
-      <div className="break-words whitespace-pre-wrap">{block.text}</div>
-      <div className="flex items-center justify-between mt-0.5">
-        <span className="text-[10px] opacity-40">{timeAgo(block.createdAt)}</span>
-        {!compact && onDelete && (
-          <button
-            type="button"
-            className="text-[10px] opacity-0 group-hover:opacity-40 hover:!opacity-75 cursor-pointer"
-            onClick={() => onDelete(block.id)}
-          >
-            &times;
-          </button>
+    <div
+      className={`${blockClass}${selectable ? " cursor-pointer" : ""}`}
+      onClick={selectable ? () => onToggle(block.id) : undefined}
+      role={selectable ? "checkbox" : undefined}
+      aria-checked={selectable ? selected : undefined}
+    >
+      <div className="flex gap-1.5">
+        {selectable && (
+          <input
+            type="checkbox"
+            checked={selected}
+            readOnly
+            tabIndex={-1}
+            className="mt-0.5 shrink-0 pointer-events-none accent-rose-500"
+          />
         )}
+        <div className="flex-1 min-w-0">
+          <div className="break-words whitespace-pre-wrap">{block.text}</div>
+          <div className="flex items-center justify-between mt-0.5">
+            <span className="text-[10px] opacity-40">{timeAgo(block.createdAt)}</span>
+            {!selectable && onDelete && (
+              <button
+                type="button"
+                className="text-[10px] opacity-30 hover:opacity-75 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(block.id);
+                }}
+              >
+                &times;
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -51,6 +72,8 @@ export default function Component({ service }) {
   const [newText, setNewText] = useState("");
   const [status, setStatus] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const [selecting, setSelecting] = useState(false);
+  const [selected, setSelected] = useState(new Set());
   const channelRef = useRef(null);
 
   useEffect(() => {
@@ -63,6 +86,16 @@ export default function Component({ service }) {
         setBlocks((prev) => [msg.block, ...prev]);
       } else if (msg.type === "delete") {
         setBlocks((prev) => prev.filter((b) => b.id !== msg.id));
+        setSelected((prev) => {
+          if (!prev.has(msg.id)) return prev;
+          const next = new Set(prev);
+          next.delete(msg.id);
+          return next;
+        });
+      } else if (msg.type === "delete-many") {
+        const idSet = new Set(msg.ids);
+        setBlocks((prev) => prev.filter((b) => !idSet.has(b.id)));
+        setSelected(new Set());
       }
     };
     return () => {
@@ -116,15 +149,48 @@ export default function Component({ service }) {
     try {
       await callApi({ action: "delete", id });
       setBlocks((prev) => prev.filter((b) => b.id !== id));
+      setSelected((prev) => {
+        if (!prev.has(id)) return prev;
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
       channelRef.current?.postMessage({ type: "delete", id });
     } catch (error) {
       setStatus(error.message);
     }
   };
 
+  const deleteSelected = async () => {
+    if (selected.size === 0) return;
+    setStatus(null);
+    const ids = [...selected];
+    try {
+      await callApi({ action: "delete-many", ids });
+      const idSet = new Set(ids);
+      setBlocks((prev) => prev.filter((b) => !idSet.has(b.id)));
+      setSelected(new Set());
+      setSelecting(false);
+      channelRef.current?.postMessage({ type: "delete-many", ids });
+    } catch (error) {
+      setStatus(error.message);
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const lock = () => {
     setUnlocked(false);
     setExpanded(false);
+    setSelecting(false);
+    setSelected(new Set());
     setPassword("");
     setBlocks([]);
     setNewText("");
@@ -134,11 +200,18 @@ export default function Component({ service }) {
   useEffect(() => {
     if (!expanded) return undefined;
     const onKeyDown = (event) => {
-      if (event.key === "Escape") setExpanded(false);
+      if (event.key === "Escape") {
+        if (selecting) {
+          setSelecting(false);
+          setSelected(new Set());
+        } else {
+          setExpanded(false);
+        }
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [expanded]);
+  }, [expanded, selecting]);
 
   const addForm = (
     <form className="flex flex-row gap-1" onSubmit={addBlock}>
@@ -180,7 +253,7 @@ export default function Component({ service }) {
                 <div className="text-xs opacity-40 px-1 py-2 text-center">{t("scratchpad.empty")}</div>
               )}
               {blocks.map((block) => (
-                <NoteBlock key={block.id} block={block} compact />
+                <NoteBlock key={block.id} block={block} onDelete={deleteBlock} />
               ))}
             </div>
             {addForm}
@@ -213,17 +286,45 @@ export default function Component({ service }) {
               onClick={() => setExpanded(false)}
             />
             <div className="absolute inset-x-2 bottom-2 top-14 sm:inset-x-10 sm:inset-y-16 flex flex-col gap-2 rounded-md overflow-hidden shadow-xl bg-theme-100 dark:bg-theme-800 p-3">
-              {addForm}
+              <div className="flex flex-row gap-1 items-center shrink-0">
+                <div className="flex-1">{addForm}</div>
+                <button
+                  type="button"
+                  className={`${buttonClass} ${selecting ? "!bg-theme-300/70 dark:!bg-theme-700/70" : ""}`}
+                  onClick={() => {
+                    setSelecting((s) => !s);
+                    setSelected(new Set());
+                  }}
+                >
+                  {t("scratchpad.select")}
+                </button>
+              </div>
               <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1.5">
                 {blocks.length === 0 && (
                   <div className="text-xs opacity-40 text-center py-8">{t("scratchpad.empty")}</div>
                 )}
                 {blocks.map((block) => (
-                  <NoteBlock key={block.id} block={block} onDelete={deleteBlock} />
+                  <NoteBlock
+                    key={block.id}
+                    block={block}
+                    onDelete={deleteBlock}
+                    selectable={selecting}
+                    selected={selected.has(block.id)}
+                    onToggle={toggleSelect}
+                  />
                 ))}
               </div>
-              <div className="flex flex-row items-center gap-1">
+              <div className="flex flex-row items-center gap-1 shrink-0">
                 {status && <div className="text-xs opacity-75 mr-auto">{status}</div>}
+                {selecting && selected.size > 0 && (
+                  <button
+                    type="button"
+                    className="bg-rose-500/80 hover:bg-rose-500 text-white rounded-sm px-3 py-1 text-xs cursor-pointer mr-auto"
+                    onClick={deleteSelected}
+                  >
+                    {t("scratchpad.deleteSelected", { count: selected.size })}
+                  </button>
+                )}
                 <button type="button" className={`${buttonClass} ml-auto`} onClick={lock}>
                   {t("scratchpad.lock")}
                 </button>
