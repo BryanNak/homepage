@@ -396,10 +396,10 @@
     "password": "Master password",
     "unlock": "Unlock",
     "lock": "Lock",
-    "save": "Save",
-    "saved": "Saved",
     "expand": "Expand",
-    "close": "Close"
+    "close": "Close",
+    "addNote": "Add a note...",
+    "empty": "No notes yet"
   },
   "terminal": {
     "title": "Terminal",

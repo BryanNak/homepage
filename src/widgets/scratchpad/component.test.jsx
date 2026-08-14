@@ -9,9 +9,18 @@ import Component from "./component";
 
 const service = { widget: { type: "scratchpad" } };
 
+class MockBroadcastChannel {
+  constructor() {
+    this.onmessage = null;
+    this.postMessage = vi.fn();
+    this.close = vi.fn();
+  }
+}
+
 describe("widgets/scratchpad/component", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn());
+    vi.stubGlobal("BroadcastChannel", MockBroadcastChannel);
   });
 
   afterEach(() => {
@@ -25,31 +34,65 @@ describe("widgets/scratchpad/component", () => {
     expect(screen.getByText("scratchpad.unlock")).toBeInTheDocument();
   });
 
-  it("unlocks and shows the decrypted text", async () => {
-    fetch.mockResolvedValue({ ok: true, json: async () => ({ text: "my secret" }) });
+  it("unlocks and shows the decrypted blocks", async () => {
+    const blocks = [
+      { id: "aaa", text: "first note", createdAt: Date.now() - 60000 },
+      { id: "bbb", text: "second note", createdAt: Date.now() - 120000 },
+    ];
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ blocks }) });
 
     renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
 
     fireEvent.change(screen.getByPlaceholderText("scratchpad.password"), { target: { value: "hunter2" } });
     fireEvent.click(screen.getByText("scratchpad.unlock"));
 
-    await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("my secret"));
+    await waitFor(() => expect(screen.getByText("first note")).toBeInTheDocument());
+    expect(screen.getByText("second note")).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith(
       "/api/custom/scratchpad",
       expect.objectContaining({ method: "POST", body: JSON.stringify({ password: "hunter2", action: "load" }) }),
     );
   });
 
-  it("shows the expand button after unlocking", async () => {
-    fetch.mockResolvedValue({ ok: true, json: async () => ({ text: "notes" }) });
+  it("shows empty state when no blocks exist", async () => {
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ blocks: [] }) });
 
     renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
 
     fireEvent.change(screen.getByPlaceholderText("scratchpad.password"), { target: { value: "hunter2" } });
     fireEvent.click(screen.getByText("scratchpad.unlock"));
 
-    await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("notes"));
-    expect(screen.getByTitle("scratchpad.expand")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("scratchpad.empty")).toBeInTheDocument());
+  });
+
+  it("adds a new block", async () => {
+    const block = { id: "ccc", text: "new note", createdAt: Date.now() };
+    fetch
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ blocks: [] }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ block }) });
+
+    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+
+    fireEvent.change(screen.getByPlaceholderText("scratchpad.password"), { target: { value: "hunter2" } });
+    fireEvent.click(screen.getByText("scratchpad.unlock"));
+
+    await waitFor(() => expect(screen.getByText("scratchpad.empty")).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText("scratchpad.addNote"), { target: { value: "new note" } });
+    fireEvent.click(screen.getByText("+"));
+
+    await waitFor(() => expect(screen.getByText("new note")).toBeInTheDocument());
+  });
+
+  it("shows the expand button after unlocking", async () => {
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ blocks: [] }) });
+
+    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+
+    fireEvent.change(screen.getByPlaceholderText("scratchpad.password"), { target: { value: "hunter2" } });
+    fireEvent.click(screen.getByText("scratchpad.unlock"));
+
+    await waitFor(() => expect(screen.getByTitle("scratchpad.expand")).toBeInTheDocument());
   });
 
   it("shows the error and stays locked on a wrong password", async () => {

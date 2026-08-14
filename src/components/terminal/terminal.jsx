@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
 import { applyModifiers } from "./keys";
+import createTerminalSync from "./sync";
 import Toolbar from "./toolbar";
-
-// ttyd websocket protocol: client sends "0"+data (input), "1"+json (resize);
-// server sends "0"+data (output), "1"+title, "2"+preferences
-const INPUT = "0";
-const RESIZE = "1";
-const OUTPUT_BYTE = "0".charCodeAt(0);
 
 export default function Terminal({ src, fontSize, cwd, onStatus }) {
   const containerRef = useRef(null);
-  const wsRef = useRef(null);
+  const syncRef = useRef(null);
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
   const modifiersRef = useRef({ ctrl: false, alt: false });
@@ -42,8 +37,7 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
   };
 
   const sendInput = (data) => {
-    const ws = wsRef.current;
-    if (ws?.readyState === WebSocket.OPEN) ws.send(INPUT + data);
+    syncRef.current?.sendInput(data);
   };
 
   useEffect(() => {
@@ -52,10 +46,7 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
     if (!term || !fitAddon) return;
     term.options.fontSize = fontSize ?? 14;
     fitAddon.fit();
-    const ws = wsRef.current;
-    if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(RESIZE + JSON.stringify({ columns: term.cols, rows: term.rows }));
-    }
+    syncRef.current?.sendResize(term.cols, term.rows);
   }, [fontSize]);
 
   useEffect(() => {
@@ -75,8 +66,8 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
 
     const teardown = () => {
       resizeObserver?.disconnect();
-      if (wsRef.current && wsRef.current.readyState <= WebSocket.OPEN) wsRef.current.close();
-      wsRef.current = null;
+      syncRef.current?.dispose();
+      syncRef.current = null;
       termRef.current = null;
       fitAddonRef.current = null;
       term?.dispose();
@@ -108,32 +99,20 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
       termRef.current = term;
       fitAddonRef.current = fitAddon;
 
-      const url = new URL(src);
-      const wsProtocol = url.protocol === "https:" ? "wss:" : "ws:";
-      const ws = new WebSocket(`${wsProtocol}//${url.host}${url.pathname.replace(/\/$/, "")}/ws`, ["tty"]);
-      ws.binaryType = "arraybuffer";
-      wsRef.current = ws;
+      const sync = createTerminalSync({
+        src,
+        cwd,
+        onOutput: (data) => term.write(data),
+        onStatus: (s) => {
+          if (!disposed) updateStatus(s);
+        },
+      });
+      syncRef.current = sync;
+      sync.sendResize(term.cols, term.rows);
 
-      ws.onopen = () => {
-        updateStatus("connected");
-        ws.send(JSON.stringify({ AuthToken: "", columns: term.cols, rows: term.rows }));
-        ws.send(RESIZE + JSON.stringify({ columns: term.cols, rows: term.rows }));
-        if (!touch) term.focus();
-        if (cwd) {
-          setTimeout(() => {
-            if (ws.readyState === WebSocket.OPEN) ws.send(INPUT + `cd ${cwd} && clear\r`);
-          }, 150);
-        }
-      };
-      ws.onmessage = (event) => {
-        const data = new Uint8Array(event.data);
-        if (data[0] === OUTPUT_BYTE) term.write(data.subarray(1));
-      };
-      ws.onclose = () => {
-        if (!disposed) updateStatus("disconnected");
-      };
+      if (!touch) term.focus();
 
-      term.onData((data) => sendInput(consumeModifiers(data)));
+      term.onData((data) => sync.sendInput(consumeModifiers(data)));
 
       if (touch) {
         let lastTouchY = null;
@@ -161,9 +140,7 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
       resizeObserver = new ResizeObserver(() => {
         if (!node.offsetWidth) return;
         fitAddon.fit();
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(RESIZE + JSON.stringify({ columns: term.cols, rows: term.rows }));
-        }
+        sync.sendResize(term.cols, term.rows);
       });
       resizeObserver.observe(node);
 
