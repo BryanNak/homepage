@@ -16,6 +16,7 @@ jobs:
   synchronize-with-crowdin:
     name: Crowdin Sync
     runs-on: ubuntu-latest
+    if: github.repository == 'gethomepage/homepage' || (secrets.CROWDIN_PROJECT_ID != '' && secrets.CROWDIN_PERSONAL_TOKEN != '')
 
     steps:
       - name: Checkout
