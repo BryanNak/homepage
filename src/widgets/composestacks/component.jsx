@@ -4,6 +4,7 @@ import Container from "components/services/widget/container";
 import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import useSWR from "swr";
 
 const buttonClass =
@@ -27,8 +28,23 @@ function LogsModal({ stackName, baseUrl, onClose }) {
     if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight;
   }, [logs]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} role="presentation" aria-hidden="true" />
       <div className="relative w-[90vw] max-w-3xl h-[70vh] flex flex-col rounded-md overflow-hidden shadow-xl bg-theme-100 dark:bg-theme-800">
         <div className="flex flex-row items-center justify-between px-3 py-2 text-xs shrink-0">
@@ -198,7 +214,11 @@ export default function Component({ service }) {
           </div>
         )}
       </div>
-      {logsStack && <LogsModal stackName={logsStack} baseUrl={baseUrl} onClose={() => setLogsStack(null)} />}
+      {logsStack &&
+        createPortal(
+          <LogsModal stackName={logsStack} baseUrl={baseUrl} onClose={() => setLogsStack(null)} />,
+          document.body,
+        )}
     </Container>
   );
 }
