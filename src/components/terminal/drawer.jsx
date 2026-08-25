@@ -31,7 +31,9 @@ export default function TerminalDrawer({ config, showRef }) {
     setOpen(true);
   };
 
-  if (showRef) showRef.current = show;
+  useEffect(() => {
+    if (showRef) showRef.current = show;
+  }, [showRef]);
 
   const disconnect = () => {
     setStarted(false);

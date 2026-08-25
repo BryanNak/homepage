@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import classNames from "classnames";
 import BookmarksGroup from "components/bookmarks/group";
 import ErrorBoundary from "components/errorboundry";
@@ -107,36 +106,35 @@ function Index({ initialSettings, fallback }) {
   const [stale, setStale] = useState(false);
   const { data: errorsData } = useSWR("/api/validate");
   const { error: validateError } = errorsData || {};
-  const { data: hashData, mutate: mutateHash } = useSWR("/api/hash");
+
+  const handleHashData = useCallback((hashData) => {
+    if (typeof window === "undefined" || !hashData?.hash) return;
+
+    const previousHash = localStorage.getItem("hash");
+
+    if (!previousHash) {
+      localStorage.setItem("hash", hashData.hash);
+    }
+
+    if (previousHash && previousHash !== hashData.hash) {
+      setStale(true);
+      localStorage.setItem("hash", hashData.hash);
+
+      fetch("/api/revalidate").then((res) => {
+        if (res.ok) {
+          window.location.reload();
+        }
+      });
+    }
+  }, []);
+
+  const { mutate: mutateHash } = useSWR("/api/hash", { onSuccess: handleHashData });
 
   useEffect(() => {
     if (windowFocused) {
       mutateHash();
     }
   }, [windowFocused, mutateHash]);
-
-  useEffect(() => {
-    if (hashData) {
-      if (typeof window !== "undefined") {
-        const previousHash = localStorage.getItem("hash");
-
-        if (!previousHash) {
-          localStorage.setItem("hash", hashData.hash);
-        }
-
-        if (previousHash && previousHash !== hashData.hash) {
-          setStale(true);
-          localStorage.setItem("hash", hashData.hash);
-
-          fetch("/api/revalidate").then((res) => {
-            if (res.ok) {
-              window.location.reload();
-            }
-          });
-        }
-      }
-    }
-  }, [hashData]);
 
   if (validateError) {
     return (
@@ -179,7 +177,7 @@ function Index({ initialSettings, fallback }) {
               </div>
               <div className="p-2 text-theme-100 dark:text-theme-200">
                 <pre className="opacity-50 font-bold pb-2">
-                  Reason: "{error.reason}" at line {error.mark?.line}
+                  Reason: &quot;{error.reason}&quot; at line {error.mark?.line}
                 </pre>
                 <pre className="font-italic">Check logs for details.</pre>
               </div>
@@ -271,6 +269,13 @@ function Home({ initialSettings }) {
           e.key.match(/([à-ü]|[À-Ü]|!)/g) ||
           (e.key === "v" && (e.ctrlKey || e.metaKey))
         ) {
+          if (e.key.length === 1 && !(e.key === "v" && (e.ctrlKey || e.metaKey))) {
+            e.preventDefault();
+            // whitespace opens the search but shouldn't be in it
+            if (e.key.trim()) {
+              setSearchString((currentSearchString) => currentSearchString + e.key);
+            }
+          }
           setSearching(true);
         } else if (e.key === "Escape") {
           setSearchString("");
@@ -427,10 +432,11 @@ function Home({ initialSettings }) {
         />
         {settings.disableIndexing && <meta name="robots" content="noindex, nofollow" />}
         {settings.base && <base href={settings.base} />}
-        {settings.favicon ? (
+        {/* from props, not context so its set before running JS */}
+        {initialSettings.favicon ? (
           <>
-            <link rel="icon" href={settings.favicon} />
-            <link rel="apple-touch-icon" sizes="180x180" href={settings.favicon} />
+            <link rel="icon" href={initialSettings.favicon} />
+            <link rel="apple-touch-icon" sizes="180x180" href={initialSettings.favicon} />
           </>
         ) : (
           <>

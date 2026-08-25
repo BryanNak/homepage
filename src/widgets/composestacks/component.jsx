@@ -3,35 +3,18 @@ import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
 import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import useSWR from "swr";
 
 const buttonClass =
   "bg-theme-200/50 dark:bg-theme-900/40 hover:bg-theme-300/50 dark:hover:bg-theme-900/60 disabled:opacity-40 disabled:cursor-not-allowed rounded-sm px-2 py-0.5 text-xs cursor-pointer";
 
 function LogsModal({ stackName, baseUrl, onClose }) {
   const { t } = useTranslation();
-  const [logs, setLogs] = useState(null);
-  const [error, setError] = useState(null);
   const preRef = useRef(null);
-  const intervalRef = useRef(null);
-
-  const fetchLogs = useCallback(async () => {
-    try {
-      const response = await fetch(`${baseUrl}&logs&stack=${encodeURIComponent(stackName)}&tail=200`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
-      setLogs(data.logs);
-      setError(null);
-    } catch (fetchError) {
-      setError(fetchError.message);
-    }
-  }, [baseUrl, stackName]);
-
-  useEffect(() => {
-    fetchLogs();
-    intervalRef.current = setInterval(fetchLogs, 5000);
-    return () => clearInterval(intervalRef.current);
-  }, [fetchLogs]);
+  const logsUrl = `${baseUrl}&logs&stack=${encodeURIComponent(stackName)}&tail=200`;
+  const { data, error } = useSWR(logsUrl, { refreshInterval: 5000 });
+  const logs = data?.logs;
 
   useEffect(() => {
     if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight;
@@ -51,7 +34,7 @@ function LogsModal({ stackName, baseUrl, onClose }) {
           ref={preRef}
           className="flex-1 min-h-0 overflow-auto p-2 m-1 rounded-sm bg-black/80 text-white/90 text-[10px] leading-tight font-mono whitespace-pre-wrap break-all"
         >
-          {error && <span className="text-rose-400">{error}</span>}
+          {error && <span className="text-rose-400">{error.message}</span>}
           {logs ?? t("composestacks.loading")}
         </pre>
       </div>
@@ -63,8 +46,6 @@ export default function Component({ service }) {
   const { t } = useTranslation();
   const { widget } = service;
 
-  const [stacks, setStacks] = useState(null);
-  const [error, setError] = useState(null);
   const [busyStack, setBusyStack] = useState(null);
   const [message, setMessage] = useState(null);
   const [actionOutput, setActionOutput] = useState(null);
@@ -76,23 +57,8 @@ export default function Component({ service }) {
     index: widget.index,
   })}`;
 
-  const refresh = useCallback(async () => {
-    try {
-      const response = await fetch(baseUrl);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
-      setStacks(data.stacks);
-      setError(null);
-    } catch (fetchError) {
-      setError(fetchError.message);
-    }
-  }, [baseUrl]);
-
-  useEffect(() => {
-    refresh();
-    const timer = setInterval(refresh, 30000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  const { data, error, mutate } = useSWR(baseUrl, { refreshInterval: 30000 });
+  const stacks = data?.stacks;
 
   const runAction = async (stackName, action) => {
     if (action === "down" && !window.confirm(t("composestacks.confirmDown", { stack: stackName }))) return;
@@ -111,15 +77,15 @@ export default function Component({ service }) {
           action,
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
+      const resData = await response.json();
+      if (!response.ok) throw new Error(resData.error ?? `HTTP ${response.status}`);
       setMessage(t("composestacks.done", { stack: stackName }));
-      if (data.output) setActionOutput(data.output);
+      if (resData.output) setActionOutput(resData.output);
     } catch (actionError) {
       setMessage(actionError.message);
     } finally {
       setBusyStack(null);
-      refresh();
+      mutate();
     }
   };
 

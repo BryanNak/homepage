@@ -12,20 +12,22 @@ export default function Terminal({ src, fontSize, cwd, onStatus }) {
   const modifiersRef = useRef({ ctrl: false, alt: false });
   const onStatusRef = useRef(onStatus);
   const mobileInputRef = useRef(null);
-  onStatusRef.current = onStatus;
-
   const [modifiers, setModifiers] = useState({ ctrl: false, alt: false });
   const [status, setStatus] = useState("connecting");
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      !!(window.matchMedia?.("(pointer: coarse)")?.matches || "ontouchstart" in window),
+  );
+
+  useEffect(() => {
+    onStatusRef.current = onStatus;
+  }, [onStatus]);
 
   const updateStatus = (nextStatus) => {
     setStatus(nextStatus);
     onStatusRef.current?.(nextStatus);
   };
-
-  useEffect(() => {
-    setIsTouch(window.matchMedia?.("(pointer: coarse)")?.matches || "ontouchstart" in window);
-  }, []);
 
   const consumeModifiers = (data) => {
     const out = applyModifiers(data, modifiersRef.current);
