@@ -4,10 +4,19 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "test-utils/render-with-providers";
+import { SWRConfig } from "swr";
 
 import Component from "./component";
 
 const service = { widget: { type: "composestacks", service_group: "Stacks", service_name: "Compose", index: 0 } };
+
+const renderStacks = (opts = {}) =>
+  renderWithProviders(
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <Component service={service} />
+    </SWRConfig>,
+    { settings: { hideErrors: false }, ...opts },
+  );
 
 describe("widgets/composestacks/component", () => {
   beforeEach(() => {
@@ -24,7 +33,7 @@ describe("widgets/composestacks/component", () => {
       json: async () => ({ stacks: [{ name: "media", running: 3, total: 4 }] }),
     });
 
-    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+    renderStacks();
 
     await waitFor(() => expect(screen.getByText("media")).toBeInTheDocument());
     expect(screen.getByText("3/4")).toBeInTheDocument();
@@ -43,7 +52,7 @@ describe("widgets/composestacks/component", () => {
       }),
     });
 
-    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+    renderStacks();
     await waitFor(() => expect(screen.getByText("media")).toBeInTheDocument());
 
     const names = screen.getAllByTitle(/running|status failed/).map((node) => node.textContent.trim());
@@ -56,7 +65,7 @@ describe("widgets/composestacks/component", () => {
       json: async () => ({ stacks: [{ name: "media", running: 3, total: 4 }], ok: true }),
     });
 
-    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+    renderStacks();
     await waitFor(() => expect(screen.getByText("media")).toBeInTheDocument());
 
     fireEvent.click(screen.getByTitle("composestacks.update"));
@@ -85,7 +94,7 @@ describe("widgets/composestacks/component", () => {
     });
     vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
 
-    renderWithProviders(<Component service={service} />, { settings: { hideErrors: false } });
+    renderStacks();
     await waitFor(() => expect(screen.getByText("media")).toBeInTheDocument());
 
     fireEvent.click(screen.getByTitle("composestacks.down"));

@@ -9,11 +9,18 @@ import useSWR from "swr";
 const buttonClass =
   "bg-theme-200/50 dark:bg-theme-900/40 hover:bg-theme-300/50 dark:hover:bg-theme-900/60 disabled:opacity-40 disabled:cursor-not-allowed rounded-sm px-2 py-0.5 text-xs cursor-pointer";
 
+const fetcher = async (url) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
+  return data;
+};
+
 function LogsModal({ stackName, baseUrl, onClose }) {
   const { t } = useTranslation();
   const preRef = useRef(null);
   const logsUrl = `${baseUrl}&logs&stack=${encodeURIComponent(stackName)}&tail=200`;
-  const { data, error } = useSWR(logsUrl, { refreshInterval: 5000 });
+  const { data, error } = useSWR(logsUrl, fetcher, { refreshInterval: 5000 });
   const logs = data?.logs;
 
   useEffect(() => {
@@ -57,7 +64,7 @@ export default function Component({ service }) {
     index: widget.index,
   })}`;
 
-  const { data, error, mutate } = useSWR(baseUrl, { refreshInterval: 30000 });
+  const { data, error, mutate } = useSWR(baseUrl, fetcher, { refreshInterval: 30000 });
   const stacks = data?.stacks;
 
   const runAction = async (stackName, action) => {
