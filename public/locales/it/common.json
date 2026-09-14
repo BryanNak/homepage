@@ -39,7 +39,9 @@
         "wait": "Attendi per favore"
     },
     "search": {
-        "placeholder": "Cerca…"
+        "placeholder": "Cerca…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "Non sano",
         "not_found": "Non trovato",
         "exited": "Uscito",
-        "partial": "Parziale"
+        "partial": "Parziale",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Errore",

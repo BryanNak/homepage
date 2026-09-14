@@ -39,7 +39,9 @@
         "wait": "Veuillez patienter"
     },
     "search": {
-        "placeholder": "Recherche…"
+        "placeholder": "Recherche…",
+        "provider": "Moteur de recherche : {{name}}",
+        "select_provider": "Sélectionnez un moteur de recherche"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "Mauvaise santé",
         "not_found": "Inconnu",
         "exited": "Arrêté",
-        "partial": "Partiel"
+        "partial": "Partiel",
+        "created": "Créé",
+        "paused": "En pause",
+        "restarting": "Redémarrage",
+        "removing": "Suppression",
+        "dead": "Mort"
     },
     "ping": {
         "error": "Erreur",

@@ -39,7 +39,9 @@
         "wait": "Even geduld"
     },
     "search": {
-        "placeholder": "Zoeken…"
+        "placeholder": "Zoeken…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "Ongezond",
         "not_found": "Niet Gevonden",
         "exited": "Gestopt",
-        "partial": "Gedeeltelijk"
+        "partial": "Gedeeltelijk",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Fout",

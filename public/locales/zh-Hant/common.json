@@ -39,7 +39,9 @@
         "wait": "請稍候"
     },
     "search": {
-        "placeholder": "搜尋…"
+        "placeholder": "搜尋…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "不健康的",
         "not_found": "找不到",
         "exited": "已退出",
-        "partial": "部分"
+        "partial": "部分",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Error",

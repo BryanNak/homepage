@@ -39,7 +39,9 @@
         "wait": "Моля изчакайте"
     },
     "search": {
-        "placeholder": "Търсене…"
+        "placeholder": "Търсене…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "Процесор",
@@ -97,7 +99,12 @@
         "unhealthy": "Нездравословен",
         "not_found": "Не е открит",
         "exited": "Напуснал",
-        "partial": "Частично"
+        "partial": "Частично",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Грешка",

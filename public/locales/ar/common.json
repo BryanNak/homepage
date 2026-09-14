@@ -39,7 +39,9 @@
         "wait": "الرجاء الإنتظار"
     },
     "search": {
-        "placeholder": "بحث …"
+        "placeholder": "بحث …",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "المعالج",
@@ -97,7 +99,12 @@
         "unhealthy": "غير سليم",
         "not_found": "غير موجود",
         "exited": "خرجت",
-        "partial": "جزئي"
+        "partial": "جزئي",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "خطأ",

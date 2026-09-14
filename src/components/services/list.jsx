@@ -1,7 +1,8 @@
 import classNames from "classnames";
-import Item from "components/services/item";
 
 import { columnMap } from "../../utils/layout/columns";
+
+import Item from "components/services/item";
 
 function listClasses(layout) {
   if (layout?.style === "row") return `grid ${columnMap[layout?.columns]} gap-x-2`;

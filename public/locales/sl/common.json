@@ -39,7 +39,9 @@
         "wait": "Prosimo počakajte"
     },
     "search": {
-        "placeholder": "Iskanje…"
+        "placeholder": "Iskanje…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "Ni zdrav",
         "not_found": "Ni najden",
         "exited": "V izhodu",
-        "partial": "Delni"
+        "partial": "Delni",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Error",

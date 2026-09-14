@@ -39,7 +39,9 @@
         "wait": "Va rugăm așteptați"
     },
     "search": {
-        "placeholder": "Caută…"
+        "placeholder": "Caută…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "Procesor",
@@ -97,7 +99,12 @@
         "unhealthy": "Nesănătos",
         "not_found": "Negăsit",
         "exited": "Ieşit",
-        "partial": "Parțial"
+        "partial": "Parțial",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Error",

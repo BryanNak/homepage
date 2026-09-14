@@ -39,7 +39,9 @@
         "wait": "お待ちください"
     },
     "search": {
-        "placeholder": "検索…"
+        "placeholder": "検索…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "非健全",
         "not_found": "不明",
         "exited": "停止しました",
-        "partial": "部分的"
+        "partial": "部分的",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "エラー",

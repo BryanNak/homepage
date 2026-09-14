@@ -16,13 +16,16 @@ jobs:
   synchronize-with-crowdin:
     name: Crowdin Sync
     runs-on: ubuntu-latest
-    if: github.repository == 'gethomepage/homepage' || (secrets.CROWDIN_PROJECT_ID != '' && secrets.CROWDIN_PERSONAL_TOKEN != '')
+    env:
+      CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+      CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: crowdin action
-        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
+        if: github.repository == 'gethomepage/homepage' || (env.CROWDIN_PROJECT_ID != '' && env.CROWDIN_PERSONAL_TOKEN != '')
+        uses: crowdin/github-action@71fdb8814261dd703be4ca7c6450d21b1868da4b # v3.0.1
         with:
           upload_translations: false
           download_translations: true

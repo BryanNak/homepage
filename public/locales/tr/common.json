@@ -39,7 +39,9 @@
         "wait": "Lütfen bekleyin"
     },
     "search": {
-        "placeholder": "Ara…"
+        "placeholder": "Ara…",
+        "provider": "Search engine: {{name}}",
+        "select_provider": "Select search engine"
     },
     "resources": {
         "cpu": "İşlemci",
@@ -97,7 +99,12 @@
         "unhealthy": "Sağlıksız",
         "not_found": "Bulunamadı",
         "exited": "Kapandı",
-        "partial": "Kısmi"
+        "partial": "Kısmi",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Hata",

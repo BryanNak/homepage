@@ -99,7 +99,12 @@
     "unhealthy": "Unhealthy",
     "not_found": "Not Found",
     "exited": "Exited",
-    "partial": "Partial"
+    "partial": "Partial",
+    "created": "Created",
+    "paused": "Paused",
+    "restarting": "Restarting",
+    "removing": "Removing",
+    "dead": "Dead"
   },
   "ping": {
     "error": "Error",
@@ -158,16 +163,6 @@
     "leech": "Leech",
     "seed": "Seed"
   },
-  "forgejo": {
-    "notifications": "Notifications",
-    "issues": "Issues",
-    "pullRequests": "Pull Requests",
-    "repositories": "Repositories",
-    "pulls": "Open PRs",
-    "commits": "Commits",
-    "runs": "Actions",
-    "empty": "None"
-  },
   "freshrss": {
     "subscriptions": "Subscriptions",
     "unread": "Unread"
@@ -196,35 +191,6 @@
     "upstreams": "Upstreams",
     "requests": "Current requests",
     "requests_failed": "Failed requests"
-  },
-  "composestacks": {
-    "stacks": "Stacks",
-    "up": "Start",
-    "down": "Stop",
-    "update": "Update",
-    "uping": "Starting {{stack}}…",
-    "downing": "Stopping {{stack}}…",
-    "updateing": "Updating {{stack}}…",
-    "done": "{{stack}}: done",
-    "confirmDown": "Stop stack {{stack}}?",
-    "logs": "Logs",
-    "logs_title": "{{stack}} logs",
-    "close": "Close",
-    "loading": "Loading…",
-    "dismiss": "Dismiss"
-  },
-  "certwatch": {
-    "certificates": "Certificates",
-    "days": "{{value}} days",
-    "expired": "Expired",
-    "error": "Error"
-  },
-  "diskhealth": {
-    "disks": "Disks",
-    "standby": "Standby",
-    "failed": "Failed",
-    "error": "Error",
-    "temp": "{{value}}°C"
   },
   "changedetectionio": {
     "totalObserved": "Total Observed",
@@ -393,33 +359,6 @@
     "downloadedunread": "Downloaded & Unread",
     "nondownloadedread": "Non-Downloaded & Read",
     "nondownloadedunread": "Non-Downloaded & Unread"
-  },
-  "scratchpad": {
-    "password": "Master password",
-    "unlock": "Unlock",
-    "lock": "Lock",
-    "expand": "Expand",
-    "close": "Close",
-    "addNote": "Add a note...",
-    "empty": "No notes yet",
-    "select": "Select",
-    "deleteSelected": "Delete {{count}} selected"
-  },
-  "terminal": {
-    "title": "Terminal",
-    "idle": "Not connected",
-    "connecting": "Connecting",
-    "connected": "Connected",
-    "disconnected": "Disconnected",
-    "reconnect": "Reconnect",
-    "disconnect": "Disconnect",
-    "hide": "Hide"
-  },
-  "tailmesh": {
-    "devices": "Devices",
-    "online": "{{online}}/{{total}} online",
-    "more": "+{{value}} more",
-    "less": "Show less"
   },
   "tailscale": {
     "address": "Address",
@@ -1320,5 +1259,71 @@
     "wanted": "Wanted",
     "queued": "Queued",
     "leagues": "Leagues"
+  },
+  "forgejo": {
+    "notifications": "Notifications",
+    "issues": "Issues",
+    "pullRequests": "Pull Requests",
+    "repositories": "Repositories",
+    "pulls": "Open PRs",
+    "commits": "Commits",
+    "runs": "Actions",
+    "empty": "None"
+  },
+  "composestacks": {
+    "stacks": "Stacks",
+    "up": "Start",
+    "down": "Stop",
+    "update": "Update",
+    "uping": "Starting {{stack}}…",
+    "downing": "Stopping {{stack}}…",
+    "updateing": "Updating {{stack}}…",
+    "done": "{{stack}}: done",
+    "confirmDown": "Stop stack {{stack}}?",
+    "logs": "Logs",
+    "logs_title": "{{stack}} logs",
+    "close": "Close",
+    "loading": "Loading…",
+    "dismiss": "Dismiss"
+  },
+  "certwatch": {
+    "certificates": "Certificates",
+    "days": "{{value}} days",
+    "expired": "Expired",
+    "error": "Error"
+  },
+  "diskhealth": {
+    "disks": "Disks",
+    "standby": "Standby",
+    "failed": "Failed",
+    "error": "Error",
+    "temp": "{{value}}°C"
+  },
+  "scratchpad": {
+    "password": "Master password",
+    "unlock": "Unlock",
+    "lock": "Lock",
+    "expand": "Expand",
+    "close": "Close",
+    "addNote": "Add a note...",
+    "empty": "No notes yet",
+    "select": "Select",
+    "deleteSelected": "Delete {{count}} selected"
+  },
+  "terminal": {
+    "title": "Terminal",
+    "idle": "Not connected",
+    "connecting": "Connecting",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "reconnect": "Reconnect",
+    "disconnect": "Disconnect",
+    "hide": "Hide"
+  },
+  "tailmesh": {
+    "devices": "Devices",
+    "online": "{{online}}/{{total}} online",
+    "more": "+{{value}} more",
+    "less": "Show less"
   }
 }

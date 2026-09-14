@@ -3,10 +3,11 @@ import { useTranslation } from "next-i18next/pages";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import useSWR from "swr";
-import { SettingsContext } from "utils/contexts/settings";
 
 import ResolvedIcon from "./resolvedicon";
 import { getStoredProvider, searchProviders } from "./widgets/search/search";
+
+import { SettingsContext } from "utils/contexts/settings";
 
 const MOBILE_BUTTON_POSITIONS = {
   "top-left": "top-4 left-4",
@@ -140,8 +141,8 @@ export default function QuickLaunch({
     ? MOBILE_BUTTON_POSITIONS[settings.quicklaunch.mobileButtonPosition]
     : null;
 
-  function openCurrentItem(newWindow) {
-    const result = results[activeItemIndex];
+  function openCurrentItem(newWindow, index = activeItemIndex) {
+    const result = results[index];
     if (result?.action) {
       result.action();
       return;
@@ -200,7 +201,8 @@ export default function QuickLaunch({
 
   function handleItemClick(event) {
     closeAndReset();
-    openCurrentItem(event.metaKey);
+    // in case hover doesnt fire, use the clicked item, not the highlighted one
+    openCurrentItem(event.metaKey, parseInt(event.currentTarget.dataset.index, 10));
   }
 
   function handleItemKeyDown(event) {

@@ -39,7 +39,9 @@
         "wait": "Počkajte prosím"
     },
     "search": {
-        "placeholder": "Hľadať…"
+        "placeholder": "Hľadať…",
+        "provider": "Vyhľadávač: {{name}}",
+        "select_provider": "Vyberte vyhľadávač"
     },
     "resources": {
         "cpu": "CPU",
@@ -97,7 +99,12 @@
         "unhealthy": "Nezdravý",
         "not_found": "Nenájdené",
         "exited": "Ukončené",
-        "partial": "Čiastočný"
+        "partial": "Čiastočný",
+        "created": "Created",
+        "paused": "Paused",
+        "restarting": "Restarting",
+        "removing": "Removing",
+        "dead": "Dead"
     },
     "ping": {
         "error": "Chyba",
