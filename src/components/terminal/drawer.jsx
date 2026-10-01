@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useTranslation } from "next-i18next/pages";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Terminal from "./terminal";
 
