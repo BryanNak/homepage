@@ -1,9 +1,9 @@
 import classNames from "classnames";
+import { useTranslation } from "next-i18next/pages";
+
 import Block from "components/services/widget/block";
 import Container from "components/services/widget/container";
 import ListRow from "components/services/widget/list-row";
-import { useTranslation } from "next-i18next/pages";
-
 import useWidgetAPI from "utils/proxy/use-widget-api";
 
 export default function Component({ service }) {

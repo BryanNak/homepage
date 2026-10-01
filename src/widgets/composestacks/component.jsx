@@ -1,11 +1,12 @@
 import classNames from "classnames";
-import Block from "components/services/widget/block";
-import Container from "components/services/widget/container";
-import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import useSWR from "swr";
+
+import ListRow from "components/services/widget/list-row";
+import Container from "components/services/widget/container";
+import Block from "components/services/widget/block";
 
 const buttonClass =
   "bg-theme-200/50 dark:bg-theme-900/40 hover:bg-theme-300/50 dark:hover:bg-theme-900/60 disabled:opacity-40 disabled:cursor-not-allowed rounded-sm px-2 py-0.5 text-xs cursor-pointer";

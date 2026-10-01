@@ -1,7 +1,8 @@
-import Container from "components/services/widget/container";
 import { useTranslation } from "next-i18next/pages";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
+import Container from "components/services/widget/container";
 
 const inputClass =
   "bg-theme-200/50 dark:bg-theme-900/20 rounded-sm p-2 text-xs w-full placeholder-theme-500 dark:placeholder-theme-400";

@@ -1,9 +1,9 @@
-import Block from "components/services/widget/block";
-import Container from "components/services/widget/container";
-import ListRow from "components/services/widget/list-row";
 import { useTranslation } from "next-i18next/pages";
 import { useState } from "react";
 
+import Block from "components/services/widget/block";
+import Container from "components/services/widget/container";
+import ListRow from "components/services/widget/list-row";
 import useWidgetAPI from "utils/proxy/use-widget-api";
 
 const DEFAULT_LIMIT = 8;
